@@ -8,6 +8,12 @@ app.service('MachineService', ['$http', '$httpParamSerializerJQLike',
         method: 'GET'
       });
     };
+    this.getRequestRecords = function (app) {
+        return $http({
+          url: 'app/' + app +'/requestrecord.json',
+          method: 'GET'
+        });
+      };
     this.removeAppMachine = function (app, ip, port) {
       return $http({
         url: 'app/' + app + '/machine/remove.json',

@@ -23,12 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import com.alibaba.csp.sentinel.dashboard.domain.Result;
 import com.alibaba.csp.sentinel.dashboard.repository.metric.MetricsRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,6 +53,7 @@ public class MetricController {
     private static final long maxQueryIntervalMs = 1000 * 60 * 60;
 
     @Autowired
+    @Qualifier("jpaMetricsRepository")
     private MetricsRepository<MetricEntity> metricStore;
 
     @ResponseBody
@@ -60,72 +63,41 @@ public class MetricController {
                                             Integer pageSize,
                                             Boolean desc,
                                             Long startTime, Long endTime, String searchKey) {
-        if (StringUtil.isEmpty(app)) {
-            return Result.ofFail(-1, "app can't be null or empty");
-        }
-        if (pageIndex == null || pageIndex <= 0) {
-            pageIndex = 1;
-        }
-        if (pageSize == null) {
-            pageSize = 6;
-        }
-        if (pageSize >= 20) {
-            pageSize = 20;
-        }
-        if (desc == null) {
-            desc = true;
-        }
-        if (endTime == null) {
-            endTime = System.currentTimeMillis();
-        }
-        if (startTime == null) {
-            startTime = endTime - 1000 * 60 * 5;
-        }
-        if (endTime - startTime > maxQueryIntervalMs) {
-            return Result.ofFail(-1, "time intervalMs is too big, must <= 1h");
-        }
-        List<String> resources = metricStore.listResourcesOfApp(app);
-        logger.debug("queryTopResourceMetric(), resources.size()={}", resources.size());
-
-        if (resources == null || resources.isEmpty()) {
+    	
+    	List<String> topResource = new ArrayList<>();
+    	 
+        final Map<String, Iterable<MetricVo>> map = new ConcurrentHashMap<>();
+     
+     Integer totalCount = 0;
+     Integer totalPage = 0;
+        totalCount = metricStore.countByTime(searchKey);
+        if (totalCount==0){
             return Result.ofSuccess(null);
         }
-        if (!desc) {
-            Collections.reverse(resources);
+        totalPage = (totalCount + pageSize - 1) / pageSize;
+        if(StringUtil.isNotBlank(searchKey)&&totalPage==1){
+            pageIndex = 1;
         }
-        if (StringUtil.isNotEmpty(searchKey)) {
-            List<String> searched = new ArrayList<>();
-            for (String resource : resources) {
-                if (resource.contains(searchKey)) {
-                    searched.add(resource);
-                }
+            List<MetricEntity> entities = metricStore.queryByTime(pageIndex,pageSize,searchKey);
+            if (entities!=null && entities.size()!=0) {
+               for (MetricEntity entity:entities) {
+                  String res = entity.getResource();
+              List<MetricVo> vos = MetricVo.fromMetricEntities(entities, res);
+              map.put(res, vos);
+             }
+             topResource = entities.stream().map(MetricEntity::getResource).collect(Collectors.toList());
+     
             }
-            resources = searched;
-        }
-        int totalPage = (resources.size() + pageSize - 1) / pageSize;
-        List<String> topResource = new ArrayList<>();
-        if (pageIndex <= totalPage) {
-            topResource = resources.subList((pageIndex - 1) * pageSize,
-                Math.min(pageIndex * pageSize, resources.size()));
-        }
-        final Map<String, Iterable<MetricVo>> map = new ConcurrentHashMap<>();
-        logger.debug("topResource={}", topResource);
-        long time = System.currentTimeMillis();
-        for (final String resource : topResource) {
-            List<MetricEntity> entities = metricStore.queryByAppAndResourceBetween(
-                app, resource, startTime, endTime);
-            logger.debug("resource={}, entities.size()={}", resource, entities == null ? "null" : entities.size());
-            List<MetricVo> vos = MetricVo.fromMetricEntities(entities, resource);
-            Iterable<MetricVo> vosSorted = sortMetricVoAndDistinct(vos);
-            map.put(resource, vosSorted);
-        }
-        logger.debug("queryTopResourceMetric() total query time={} ms", System.currentTimeMillis() - time);
+     if (topResource == null || topResource.isEmpty()) {
+      return Result.ofSuccess(null);
+     }
+     
         Map<String, Object> resultMap = new HashMap<>(16);
-        resultMap.put("totalCount", resources.size());
+        resultMap.put("totalCount", totalCount);
         resultMap.put("totalPage", totalPage);
         resultMap.put("pageIndex", pageIndex);
         resultMap.put("pageSize", pageSize);
-
+     
         Map<String, Iterable<MetricVo>> map2 = new LinkedHashMap<>();
         // order matters.
         for (String identity : topResource) {
@@ -133,6 +105,81 @@ public class MetricController {
         }
         resultMap.put("metric", map2);
         return Result.ofSuccess(resultMap);
+
+    	
+//        if (StringUtil.isEmpty(app)) {
+//            return Result.ofFail(-1, "app can't be null or empty");
+//        }
+//        if (pageIndex == null || pageIndex <= 0) {
+//            pageIndex = 1;
+//        }
+//        if (pageSize == null) {
+//            pageSize = 6;
+//        }
+//        if (pageSize >= 20) {
+//            pageSize = 20;
+//        }
+//        if (desc == null) {
+//            desc = true;
+//        }
+//        if (endTime == null) {
+//            endTime = System.currentTimeMillis();
+//        }
+//        if (startTime == null) {
+//            startTime = endTime - 1000 * 60 * 5;
+//        }
+//        if (endTime - startTime > maxQueryIntervalMs) {
+//            return Result.ofFail(-1, "time intervalMs is too big, must <= 1h");
+//        }
+//        List<String> resources = metricStore.listResourcesOfApp(app);
+//        logger.debug("queryTopResourceMetric(), resources.size()={}", resources.size());
+//
+//        if (resources == null || resources.isEmpty()) {
+//            return Result.ofSuccess(null);
+//        }
+//        if (!desc) {
+//            Collections.reverse(resources);
+//        }
+//        if (StringUtil.isNotEmpty(searchKey)) {
+//            List<String> searched = new ArrayList<>();
+//            for (String resource : resources) {
+//                if (resource.contains(searchKey)) {
+//                    searched.add(resource);
+//                }
+//            }
+//            resources = searched;
+//        }
+//        int totalPage = (resources.size() + pageSize - 1) / pageSize;
+//        List<String> topResource = new ArrayList<>();
+//        if (pageIndex <= totalPage) {
+//            topResource = resources.subList((pageIndex - 1) * pageSize,
+//                Math.min(pageIndex * pageSize, resources.size()));
+//        }
+//        final Map<String, Iterable<MetricVo>> map = new ConcurrentHashMap<>();
+//        logger.debug("topResource={}", topResource);
+//        long time = System.currentTimeMillis();
+//        for (final String resource : topResource) {
+//            List<MetricEntity> entities = metricStore.queryByAppAndResourceBetween(
+//                app, resource, startTime, endTime);
+//            logger.debug("resource={}, entities.size()={}", resource, entities == null ? "null" : entities.size());
+//            List<MetricVo> vos = MetricVo.fromMetricEntities(entities, resource);
+//            Iterable<MetricVo> vosSorted = sortMetricVoAndDistinct(vos);
+//            map.put(resource, vosSorted);
+//        }
+//        logger.debug("queryTopResourceMetric() total query time={} ms", System.currentTimeMillis() - time);
+//        Map<String, Object> resultMap = new HashMap<>(16);
+//        resultMap.put("totalCount", resources.size());
+//        resultMap.put("totalPage", totalPage);
+//        resultMap.put("pageIndex", pageIndex);
+//        resultMap.put("pageSize", pageSize);
+//
+//        Map<String, Iterable<MetricVo>> map2 = new LinkedHashMap<>();
+//        // order matters.
+//        for (String identity : topResource) {
+//            map2.put(identity, map.get(identity));
+//        }
+//        resultMap.put("metric", map2);
+//        return Result.ofSuccess(resultMap);
     }
 
     @ResponseBody

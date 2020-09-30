@@ -25,7 +25,7 @@ app.controller('MetricCtl', ['$scope', '$stateParams', 'MetricService', '$interv
     var DATA_REFRESH_INTERVAL = 1000 * 10;
 
     $scope.servicePageConfig = {
-      pageSize: 6,
+      pageSize: 3000,
       currentPageIndex: 1,
       totalPage: 1,
       totalCount: 0,

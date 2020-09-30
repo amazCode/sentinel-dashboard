@@ -17,6 +17,8 @@ package com.alibaba.csp.sentinel.dashboard.repository.metric;
 
 import java.util.List;
 
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.MetricEntity;
+
 /**
  * Repository interface for aggregated metrics data.
  *
@@ -57,4 +59,15 @@ public interface MetricsRepository<T> {
      * @return list of resources
      */
     List<String> listResourcesOfApp(String app);
+    
+    
+    
+    
+    List<T> queryByTime(Integer pageIndex, Integer pageSize,String key);
+     
+    Integer countByTime(String key);
+     
+    void removeAll();
+    
+    List<MetricEntity> getRequestRecord();
 }

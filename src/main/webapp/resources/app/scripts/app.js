@@ -283,6 +283,21 @@ angular
         }
       })
 
+       .state('dashboard.test', {//测试
+        templateUrl: 'app/views/request_record.html',
+        url: '/app/:app',
+        controller: 'RequestRecordCtl',
+        resolve: {
+          loadMyFiles: ['$ocLazyLoad', function ($ocLazyLoad) {
+            return $ocLazyLoad.load({
+              name: 'sentinelDashboardApp',
+              files: [
+                'app/scripts/controllers/request_record.js',
+              ]
+            });
+          }]
+        }
+      })
       .state('dashboard.identity', {
         templateUrl: 'app/views/identity.html',
         url: '/identity/:app',
