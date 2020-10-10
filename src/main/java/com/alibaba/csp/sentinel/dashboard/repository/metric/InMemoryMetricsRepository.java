@@ -163,4 +163,28 @@ public class InMemoryMetricsRepository implements MetricsRepository<MetricEntity
             readWriteLock.readLock().unlock();
         }
     }
+
+	@Override
+	public List<MetricEntity> queryByTime(Integer pageIndex, Integer pageSize, String key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Integer countByTime(String key) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void removeAll() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<MetricEntity> getRequestRecord() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

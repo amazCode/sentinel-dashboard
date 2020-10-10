@@ -1,0 +1,78 @@
+<div class="row" style="margin-left: 1px; margin-top:10px; height: 50px;">
+  <div class="col-md-6" style="margin-bottom: 10px;">
+    <span style="font-size: 30px;font-weight: bold;">{{app}}</span>
+  </div>
+</div>
+
+<div class="separator"></div>
+<div class="container-fluid">
+  <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="inputs-header">
+          <span class="brand" style="font-size: 13px;">服务管理</span>
+           <button class="btn btn-default-inverse" ng-click="addService()"
+           style="float: right;margin-right: 10px;height: 30px;font-size: 12px;" >
+            <i class="fa fa-plus"></i>新增</button>
+        </div>
+
+        <!--.tools-header -->
+        <div class="card-body" style="padding: 0px 0px;">
+          <table class="table" style="border-left: none; border-right:none;margin-top: 10px;">
+            <thead>
+              <tr style="background: #F3F5F7;">
+                <td>序号</td>
+                <td>服务名</td>
+                <td>所属厂家</td>
+                 <td>服务描述</td>
+                <td>负责人</td>
+                <td>维护人员</td>
+                <td>创建时间</td>
+                <td>操作</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr current-page="machinesPageConfig.currentPageIndex" 
+              dir-paginate="entry in records |orderBy:entry.createDate | itemsPerPage: machinesPageConfig.pageSize "
+                pagination-id="entriesPagination">
+                <td style="word-wrap:break-word;word-break:break-all;">{{$index+1}}</td>
+                <td style="word-wrap:break-word;word-break:break-all;">{{entry.serviceName}}</td>
+                <td> {{entry.manufacturer}} </td>
+                 <td> {{entry.description}} </td>
+                <td> {{entry.chargePerson}} </td>
+                <td >{{entry.maintainPerson}} </td>
+                <td >{{entry.createDate | date:'yyyy-MM-dd HH:mm:ss'}} </td>
+                <td>
+                <button class="btn btn-xs btn-outline-primary" type="button" ng-click="editService(entry)" style="font-size: 12px; height:25px;">编辑</button>
+                     <button class="btn btn-xs btn-outline-primary" type="button" ng-click="editServiceRecords(entry)" style="font-size: 12px; height:25px;">详细</button>
+                    <button class="btn btn-xs btn-outline-danger" style="height: 25px; font-size: 12px;" ng-click="removeServiceRecord(entry.id)">移除</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- .card-body -->
+        <div class="pagination-footer">
+          <dir-pagination-controls boundary-links="true" template-url="app/views/pagination.tpl.html" pagination-id="entriesPagination"
+            on-page-change="">
+          </dir-pagination-controls>
+          <div class="tools" style="">
+            <span>共 {{machinesPageConfig.totalCount}} 条记录, </span>
+            <span>
+              每页
+              <input class="form-control" ng-model="machinesPageConfig.pageSize"> 条记录,
+            </span>
+            <span>第 {{machinesPageConfig.currentPageIndex}} / {{machinesPageConfig.totalPage}} 页</span>
+          </div>
+          <!-- .tools -->
+        </div>
+        <!-- pagination-footer -->
+      </div>
+      <!-- .card -->
+    </div>
+    <!-- .col-md-12 -->
+  </div>
+  <!-- -->
+</div>
+
+<!-- .container-fluid -->

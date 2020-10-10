@@ -205,7 +205,7 @@ function(e, t, r, a) {
                 })
             }]
         }//新增
-    }).state("dashboard.test", {
+    }).state("dashboard.record", {//请求记录统计
         templateUrl: "app/views/request_record.html",
         url: "/app/:app",
         controller: "RequestRecordCtl",
@@ -215,6 +215,19 @@ function(e, t, r, a) {
                 return e.load({
                     name: "sentinelDashboardApp",
                     files: ["app/scripts/controllers/request_record.js"]
+                })
+            }]
+        }
+    }).state("dashboard.servicemanager", {//服务管理
+        templateUrl: "app/views/service-manager.html",
+        url: "/app/:app",
+        controller: "ServiceManagerCtl",
+        resolve: {
+            loadMyFiles: ["$ocLazyLoad",
+            function(e) {
+                return e.load({
+                    name: "sentinelDashboardApp",
+                    files: ["app/scripts/controllers/service-manager.js"]
                 })
             }]
         }
@@ -566,6 +579,53 @@ function(a, o) {
           method: "GET"
         })
       },
+      this.getServiceDetails = function () {
+          return a({
+            url: "app/servicedetail.json",
+            method: "GET"
+          })
+        },
+        this.getServiceListByServiceRecord = function (id) {
+            return a({
+              url: "app/list/service/"+id,
+              method: "GET"
+            })
+          },
+      this.saveRule = function (rule) {
+          var param = {
+        		  id:rule.id,
+        		  serviceName: rule.serviceName,
+        		  description: rule.description,
+        		  manufacturer: rule.manufacturer,
+        		  chargePerson: rule.chargePerson,
+        		  maintainPerson: rule.maintainPerson,
+             };
+          return a({
+              url: "app/service/detail/save.json",
+              params: param,
+              method: "PUT"
+          })
+      },
+      this.reStatisticsServiceInterface = function (currentService,reStatisticsStatus) {
+    	  var param = {
+    			  id:currentService.id,
+    			  name:currentService.serviceName,
+    			  status:reStatisticsStatus,
+    	  };
+    	  return a({
+              url: "app/service/interface/restatistics",
+              params: param,
+              method: "GET"
+          })
+      },
+      this.removeServiceRecord = function (id) {
+          return a({
+            url: "app/servicedetail/remove/"+id,
+            method: "DELETE",
+          })
+        },
+      
+      
     this.removeAppMachine = function(e, t, r) {
         return a({
             url: "app/" + e + "/machine/remove.json",

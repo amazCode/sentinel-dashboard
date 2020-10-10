@@ -283,7 +283,7 @@ angular
         }
       })
 
-       .state('dashboard.test', {//测试
+       .state('dashboard.record', {//请求记录
         templateUrl: 'app/views/request_record.html',
         url: '/app/:app',
         controller: 'RequestRecordCtl',
@@ -293,6 +293,21 @@ angular
               name: 'sentinelDashboardApp',
               files: [
                 'app/scripts/controllers/request_record.js',
+              ]
+            });
+          }]
+        }
+      })
+       .state('dashboard.servicemanager', {//服务管理
+        templateUrl: 'app/views/service-manager.html',
+        url: '/app/:app',
+        controller: 'ServiceManagerCtl',
+        resolve: {
+          loadMyFiles: ['$ocLazyLoad', function ($ocLazyLoad) {
+            return $ocLazyLoad.load({
+              name: 'sentinelDashboardApp',
+              files: [
+                'app/scripts/controllers/service-manager.js',
               ]
             });
           }]

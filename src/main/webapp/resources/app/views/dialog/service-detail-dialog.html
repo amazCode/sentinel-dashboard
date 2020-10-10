@@ -1,0 +1,59 @@
+<div>
+  <span class="brand" style="font-weight:bold;">{{serviceDetailDialog.title}}</span>
+  <div class="card" style="margin-top: 20px;margin-bottom: 10px;">
+    <div class="panel-body">
+      <div class="row">
+        <form role="form" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-2 control-label">服务名称</label>
+            <div class="col-sm-9">
+              <input type="text" ng-if="serviceDetailDialog.type == 'edit'" class="form-control" placeholder="服务名称" ng-model='serviceDetail.serviceName'
+                />
+              <input type="text" ng-if="serviceDetailDialog.type == 'add'" class="form-control highlight-border" placeholder="服务名称(如：bigdata-service)" ng-model='serviceDetail.serviceName'
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label" data-toggle="tooltip" title="服务描述">服务描述</label>
+            <div class="col-sm-9">
+              <input type="text" class="form-control highlight-border" ng-model='serviceDetail.description' placeholder='服务描述'
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label">负责人员</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control highlight-border" ng-model='serviceDetail.chargePerson' />
+            </div>
+              <label class="col-sm-2 control-label">维护人员</label>
+              <div class="col-sm-3">
+                <input type='text'  class="form-control highlight-border" ng-model='serviceDetail.maintainPerson'  />
+              </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label">所属厂家</label>
+            <div class="col-sm-9">
+               <input type='text'  class="form-control highlight-border" ng-model='serviceDetail.manufacturer'  />
+            </div>
+          </div>
+
+<!-- 
+          <div class="form-group text-center" ng-if="!serviceDetail.clusterMode">
+            <a ng-click="onOpenAdvanceClick()" ng-if="serviceDetailDialog.showAdvanceButton" style="cursor: pointer;">高级选项</a>
+            <a ng-click="onCloseAdvanceClick()" ng-if="!serviceDetailDialog.showAdvanceButton" style="cursor: pointer;">关闭高级选项</a>
+          </div> -->
+        </form>
+      </div>
+      <div class="separator"></div>
+      <div clss="row" style="margin-top: 20px;">
+        <button class="btn btn-outline-danger" style="float:right; height: 30px;font-size: 12px;margin-left: 10px;" ng-click="closeThisDialog()">取消</button>
+        <button class="btn btn-outline-success" style="float:right; height: 30px;font-size: 12px;margin-left: 10px;" ng-click="saveRule()">{{serviceDetailDialog.confirmBtnText}}</button>
+        <button ng-if="serviceDetailDialog.saveAndContinueBtnText" class="btn btn-default" style="float:right; height: 30px;font-size: 12px;"
+          ng-click="saveRuleAndContinue()">{{serviceDetailDialog.saveAndContinueBtnText}}</button>
+      </div>
+    </div>
+  </div>
+</div>

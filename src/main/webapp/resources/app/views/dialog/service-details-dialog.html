@@ -1,0 +1,73 @@
+<div>
+  <span class="brand" style="font-weight:bold;">{{serviceRecordsDialog.title}}</span>
+  <div class="card" style="margin-top: 10px;margin-bottom: 5px;">
+     <div class="inputs-header">
+           <button class="btn btn-default-inverse" ng-click="reStatisticsInterface()"
+           style="float: right;margin-right: 10px;height: 30px;font-size: 12px;" >
+                          重新统计该服务接口</button>
+        </div>
+  
+    <div class="panel-body">
+     <!--  <div class="row" style="margin-top: 20px; margin-bottom: 20px;"> -->
+       <!--  <form role="form" class="form-horizontal"> -->
+        <div style=" height:500px; overflow:scroll; overflow-x:hidden;overflow-y: auto;">
+         <table class="table"   style="border-left: none; border-right:none;margin-top: -5px;padding-top: 1px;"><!-- table-layout: fixed; -->
+            <thead>
+              <tr style="background: #F3F5F7;">
+                <td>序号</td>
+                <td>接口名</td>
+                <td>接口地址</td>
+                 <td>接口描述</td>
+                <td>成功qps</td>
+                <td>通过qps</td>
+                <td>异常qps</td>
+                <td>总记录数</td>
+                <td>操作</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr current-page="interfacePageConfig.currentPageIndex" 
+              dir-paginate="entry in serviceList |orderBy:entry.createDate | itemsPerPage: interfacePageConfig.pageSize "
+                pagination-id="entriesPagination">
+                <td style="word-wrap:break-word;word-break:break-all;width:10px;">{{$index+1}}</td>
+                <td style="word-wrap:break-word;word-break:break-all;width:10px;">{{entry.urlName}}</td>
+                <td style="width:50px;">{{entry.urlAddress}} </td><!-- white-space:nowrap;overflow:hidden;text-overflow: ellipsis" title="{{entry.urlAddress}} -->
+                 <td style="width:50px;"> {{entry.description}} </td>
+                <td style="width:5px;"> {{entry.success_qps}} </td>
+                <td style="width:5px;">{{entry.pass_qps}} </td>
+                <td style="width:5px;">{{entry.exception_qps}} </td>
+                <td style="width:5px;">{{entry.countNum}} </td>
+                <td  style="width:30px;">
+                   <button class="btn btn-xs btn-outline-primary" type="button" ng-click="editInterface(entry)" style="font-size: 12px; height:25px;">编辑</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+         </div>
+        </div>
+       <!--  <div class="pagination-footer">
+          <dir-pagination-controls boundary-links="true" template-url="app/views/pagination.tpl.html" pagination-id="test"
+            on-page-change="">
+          </dir-pagination-controls>
+          <div class="tools" style="">
+            <span>共 {{interfacePageConfig.totalCount}} 条记录, </span>
+            <span>
+                                    每页
+              <input class="form-control" ng-model="interfacePageConfig.pageSize"> 条记录,
+            </span>
+            <span>第 {{interfacePageConfig.currentPageIndex}} / {{interfacePageConfig.totalPage}} 页</span>
+          </div>
+          .tools
+        </div> -->
+      <!--   </form> -->
+      <!-- </div> -->
+      <div class="separator"></div>
+    <!--   <div clss="row" style="margin-top: 20px;">
+        <button class="btn btn-outline-danger" style="float:right; height: 30px;font-size: 12px;margin-left: 10px;" ng-click="closeThisDialog()">取消</button>
+        <button class="btn btn-outline-success" style="float:right; height: 30px;font-size: 12px;margin-left: 10px;" ng-click="saveRule()">{{serviceRecordsDialog.confirmBtnText}}</button>
+        <button ng-if="flowRuleDialog.saveAndContinueBtnText" class="btn btn-default" style="float:right; height: 30px;font-size: 12px;"
+          ng-click="saveRuleAndContinue()">{{serviceRecordsDialog.saveAndContinueBtnText}}</button>
+      </div> -->
+   
+  </div>
+</div>

@@ -15,32 +15,50 @@
  */
 package com.alibaba.csp.sentinel.dashboard.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
+import com.alibaba.csp.sentinel.dashboard.auth.AuthAction;
+import com.alibaba.csp.sentinel.dashboard.auth.AuthService.PrivilegeType;
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.MetricEntity;
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.gateway.ServiceDetailEntity;
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.gateway.ServiceInterfaceDetail;
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.FlowRuleEntity;
 import com.alibaba.csp.sentinel.dashboard.discovery.AppInfo;
 import com.alibaba.csp.sentinel.dashboard.discovery.AppManagement;
 import com.alibaba.csp.sentinel.dashboard.discovery.MachineInfo;
 import com.alibaba.csp.sentinel.dashboard.domain.Result;
 import com.alibaba.csp.sentinel.dashboard.domain.vo.MachineInfoVo;
 import com.alibaba.csp.sentinel.dashboard.domain.vo.RequestRecordVo;
+import com.alibaba.csp.sentinel.dashboard.repository.metric.JpaEntityManager;
 import com.alibaba.csp.sentinel.dashboard.repository.metric.MetricsRepository;
+import com.alibaba.nacos.client.naming.utils.CollectionUtils;
 
+import ch.qos.logback.classic.net.SyslogAppender;
 import lombok.extern.slf4j.Slf4j;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,7 +72,8 @@ public class AppController {
 
     @Autowired
     private AppManagement appManagement;
-    
+    @Autowired
+    private JpaEntityManager em;
     @Autowired
     @Qualifier("jpaMetricsRepository")
     private MetricsRepository<MetricEntity> metricStore;
@@ -93,19 +112,21 @@ public class AppController {
     	 List<RequestRecordVo> requestRecordVos = new ArrayList<>();
     	 for(Entry<String, List<MetricEntity>> entry:metricMap.entrySet()) {
     		 RequestRecordVo recordVo = new RequestRecordVo();
-    		 recordVo.setCountNum(entry.getValue().size()); 
     		 recordVo.setResource(entry.getKey());
     		 int success_qps = 0; 
     		 int pass_qps = 0;
     		 int exception_qps = 0;
     		 double spendTime = 0;
+    		 int countNum = 0;
     		 List<MetricEntity> mapValues = entry.getValue();
     		 for (MetricEntity entity : mapValues) {
+    			 countNum += entity.getCount();
     			 success_qps += entity.getSuccessQps();
     			 pass_qps += entity.getPassQps();
     			 exception_qps += entity.getExceptionQps();
 				spendTime += entity.getRt();
 			}
+    		 recordVo.setCountNum(countNum);
     		 recordVo.setException_qps(exception_qps);
     		 recordVo.setPass_qps(pass_qps);
     		 recordVo.setSuccess_qps(success_qps);
@@ -123,10 +144,97 @@ public class AppController {
     	Result<List<RequestRecordVo>> result =  Result.ofSuccess(requestRecordVos);
 		return result;
     }
+    @GetMapping(value = "/servicedetail.json")
+    public Result<List<ServiceDetailEntity>> getServiceDetails() {
+    	log.info("调用的接口：  "+"/app/servicedetail.json");
+    	List<ServiceDetailEntity>  serviceDetails = em.findByCondition(ServiceDetailEntity.class, " serviceStatus=1 ", new Object[] {});
+    	Result<List<ServiceDetailEntity>> result =  Result.ofSuccess(serviceDetails);
+		return result;
+    }
+    @GetMapping(value = "/list/service/{id}")
+    public Result<List<ServiceInterfaceDetail>> getServiceListByServiceRecord(@PathVariable(name = "id") Long id) {
+    	log.info("调用的接口：  "+"/app/list/service");
+    	if(StringUtils.isBlank(String.valueOf(id))) {
+    		return null;
+    	}
+    	List<ServiceInterfaceDetail>  serviceDetails = em.findByCondition(ServiceInterfaceDetail.class, " serviceId =?1 and serviceStatus = 1 ", new Object[] {String.valueOf(id)});
+    	Result<List<ServiceInterfaceDetail>> result =  Result.ofSuccess(serviceDetails);
+		return result;
+    }
+    
+    
+    @GetMapping(value = "/service/interface/restatistics")
+    public Result<List<ServiceInterfaceDetail>> restatisticsServiceInterface( Long id,String name,boolean status) throws SQLException {
+    	log.info("调用的接口：  "+"/app/service/interface/restatistics");
+    	if(StringUtils.isBlank(String.valueOf(id))||StringUtils.isBlank(name)) {
+    		log.error("/app/service/interface/restatistics 检查该接口，参数为空");
+    		return null;
+    	}
+    	String serviceNameMatch = "/"+name+"/";
+    	Result<List<ServiceInterfaceDetail>> result = null ;
+    	try {
+    		List<MetricEntity> metrics = em.findByCondition(MetricEntity.class, " resource like '%"+serviceNameMatch+"%'", new Object[] {});
+    		if(CollectionUtils.isEmpty(metrics))
+    			return Result.ofSuccessMsg("未找到该服务的相关接口");
+        	log.info("正在统计接口的服务的名称："+metrics.get(0).getResource().split("/")[1]);
+        	 Map<String, List<MetricEntity>>  metricMap = metrics.stream()
+        			 .filter(MetricEntity ->  MetricEntity.getResource().split("/")[1].equals(name) )
+        			 .collect(Collectors.groupingBy(MetricEntity::getResource));
+        	 List<ServiceInterfaceDetail> interfaceDetails = new ArrayList<>();
+        	 statisticsServiceInterface(metricMap,interfaceDetails,id);
+        	 if(status) {//如果为true  删除历史统计   
+        		 em.delete(ServiceInterfaceDetail.class, " serviceId =?1 ", new Object[] {String.valueOf(id)});
+        	 }else {//为false  逻辑删除 该服务下的接口历史数据状态置为0
+        		 em.executeUpdate(" update ServiceInterfaceDetail set serviceStatus = 0  where serviceId = "+String.valueOf(id));
+        	 }
+        	em.persistentBatch( interfaceDetails);
+        	result =  Result.ofSuccess(interfaceDetails);
+    	}catch(Exception e) {
+    		log.error("统计该服务的接口出现异常：服务id为："+id);
+    		return null;
+    	}
+		return result;
+    }
     
     
     
-    
+   
+
+	@PutMapping(value = "/service/detail/save.json" )//改为post
+    public Result<List<ServiceDetailEntity>> saveServiceDetail(String id,String serviceName,String description,String manufacturer
+    		,String chargePerson,String maintainPerson) throws Exception {
+    	ServiceDetailEntity entity = new ServiceDetailEntity();
+    	if(StringUtils.isNotBlank(id)) {
+    		entity.setId(Long.valueOf(id));
+    	}
+    	try {
+    		entity.setChargePerson(chargePerson);
+    		entity.setDescription(description);
+    		entity.setMaintainPerson(maintainPerson);
+    		entity.setManufacturer(manufacturer);
+    		entity.setServiceName(serviceName);
+    		entity.setCreateDate(new Date());
+        	em.createOrUpdate(entity,ServiceDetailEntity.class);
+    	}catch(Exception e) {
+    		throw new Exception("服务新增失败");
+    	}
+    	 List<ServiceDetailEntity> requestServiceDetails = Arrays.asList(entity);
+    	Result<List<ServiceDetailEntity>> result =  Result.ofSuccess(requestServiceDetails);
+    	return result;
+    }
+   
+    @RequestMapping(value = "/servicedetail/remove/{id}",method = RequestMethod.DELETE)
+    public Result<String> removeServiceRecord( @PathVariable(name = "id") Long id ) {
+        if (StringUtils.isBlank(id.toString())) {
+            return Result.ofSuccess(null);
+        }
+         try {
+        	  em.executeUpdate("update ServiceDetailEntity set serviceStatus = 0 where id ="+id);
+              return Result.ofSuccessMsg("success");
+         }catch(Exception e) {
+        	 return Result.ofFail(1, "remove failed");
+         }
+    }
     @RequestMapping(value = "/{app}/machine/remove.json")
     public Result<String> removeMachineById(
             @PathVariable("app") String app,
@@ -142,4 +250,49 @@ public class AppController {
             return Result.ofFail(1, "remove failed");
         }
     }
+    
+    /**
+     * 对接口进行统计
+     * @param metricMap
+     * @param interfaceDetails
+     * @param id
+     */
+    private void statisticsServiceInterface(Map<String, List<MetricEntity>> metricMap,
+			List<ServiceInterfaceDetail> interfaceDetails, Long id) {
+    	 Date createDate = new Date();
+    	 for(Entry<String, List<MetricEntity>> entry:metricMap.entrySet()) {
+    		 ServiceInterfaceDetail detail = new ServiceInterfaceDetail();
+    		 detail.setUrlAddress(entry.getKey());;
+    		 detail.setServiceId(String.valueOf(id));
+    		 detail.setCreateDate(createDate);
+    		 int success_qps = 0; 
+    		 int pass_qps = 0;
+    		 int exception_qps = 0;
+    		 double spendTime = 0;
+    		 int countNum = 0;
+    		 List<MetricEntity> mapValues = entry.getValue();
+    		 for (MetricEntity entity : mapValues) {
+    			 countNum += entity.getCount();
+    			 success_qps += entity.getSuccessQps();
+    			 pass_qps += entity.getPassQps();
+    			 exception_qps += entity.getExceptionQps();
+				spendTime += entity.getRt();
+			}
+    		 detail.setCountNum(countNum);
+    		 detail.setException_qps(exception_qps);
+    		 detail.setPass_qps(pass_qps);
+    		 detail.setSuccess_qps(success_qps);
+    		 detail.setSpendTime(spendTime);
+    		 interfaceDetails.add(detail);
+    	 }
+    	 interfaceDetails = interfaceDetails.stream()
+    			 .sorted(Comparator.comparing(ServiceInterfaceDetail::getCountNum).reversed())
+    			 .collect(Collectors.toList());
+    	 int ranking = 1;
+    	for (ServiceInterfaceDetail vo : interfaceDetails) {
+    		vo.setRanking(ranking);
+    		ranking++;
+		}
+	}
+    
 }

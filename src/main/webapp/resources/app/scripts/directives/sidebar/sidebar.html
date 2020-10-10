@@ -90,11 +90,19 @@
               <i class="glyphicon glyphicon-th-list"></i>&nbsp;&nbsp;机器列表</a>
           </li>
           
-           <!-- 测试列表 -->
+           <!-- 请求记录 -->
            <li ui-sref-active="active" >
-            <a ui-sref="dashboard.test({app: entry.app})">
+            <a ui-sref="dashboard.record({app: entry.app})">
               <i class="glyphicon glyphicon-align-justify"></i>&nbsp;&nbsp;请求记录</a>
           </li>
+          
+           <!--服务管理 -->
+           <li ui-sref-active="active" >
+            <a ui-sref="dashboard.servicemanager({app: entry.app})">
+              <i class="glyphicon glyphicon-th-large"></i>&nbsp;&nbsp;服务管理</a>
+          </li>
+          
+          
           
         </ul>
         <!-- /.nav-second-level -->

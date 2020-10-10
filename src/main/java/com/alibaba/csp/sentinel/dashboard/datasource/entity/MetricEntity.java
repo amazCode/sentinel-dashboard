@@ -24,7 +24,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * @author leyou
+ * @author 
  */
 @Entity
 @Table(name = "t_sentinel_metric")
