@@ -1,7 +1,7 @@
 var app = angular.module('sentinelDashboardApp');
 
-app.controller('RequestRecordCtl', ['$scope', '$stateParams', 'MachineService',
-  function ($scope, $stateParams, MachineService) {
+app.controller('RequestRecordCtl', ['$scope', '$stateParams', 'MachineService', 'ngDialog',
+  function ($scope, $stateParams, MachineService,ngDialog) {
     $scope.app = $stateParams.app;
     $scope.propertyName = '';
     $scope.reverse = false;
@@ -19,6 +19,44 @@ app.controller('RequestRecordCtl', ['$scope', '$stateParams', 'MachineService',
       $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;
       $scope.propertyName = propertyName;
     };
+    
+    
+    $scope.requestDetail = function (entity) {//请求详细
+    	$scope.requestDetailList ;
+    	 $scope.requestDetailPageConfig = {
+          	      currentPageIndex: 1,
+//          	      pageSize:10,
+          	      totalPage: 1,
+          	      totalCount: 0,
+          	    };
+    	
+        $scope.requestDetailDialog = {
+          title: '请求详细',
+          confirmBtnText: '保存'
+        };
+        requestDetailDialog = ngDialog.open({
+          template: '/app/views/dialog/request-detail-dialog.html',
+          width: 980,
+          overlay: true,
+          scope: $scope
+        });
+        
+        MachineService.getRequestDetail(entity).success(
+                function (data) {
+                  if (data.code == 0 && data.data) {
+                    $scope.requestDetailList = data.data;
+                    $scope.requestDetailPageConfig.totalCount = $scope.requestDetailList.length;
+                    $scope.requestDetailPageConfig.pageSize = $scope.requestDetailList.length;
+                  }
+                }
+              );
+    }
+    
+    
+    
+    $scope.test = function() {
+    	return 'test';
+    }
     
     $scope.reloadMachines = function() {
       MachineService.getRequestRecords($scope.app).success(

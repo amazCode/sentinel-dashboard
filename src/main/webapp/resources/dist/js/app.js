@@ -585,9 +585,19 @@ function(a, o) {
             method: "GET"
           })
         },
-        this.getServiceListByServiceRecord = function (id) {
+        this.getRequestDetail = function (entity) {
+        	var param = {
+        			resource:entity.resource
+        	}
             return a({
-              url: "app/list/service/"+id,
+              url: "app/request/detail",
+              params: param,
+              method: "GET"
+            })
+          },
+        this.getServiceListByServiceRecord = function (id,name) {
+            return a({
+              url: "app/list/service/"+id+"/"+name,
               method: "GET"
             })
           },
@@ -618,6 +628,19 @@ function(a, o) {
               method: "GET"
           })
       },
+      this.saveInterface = function (id,urlName,description) {
+    	  var param = {
+    			  id:id,
+    			  urlName:urlName,
+    			  description:description
+    	  }
+    	  return a({
+              url: "app/service/interface/save",
+              params: param,
+              method: "PUT"
+          });
+      },
+      
       this.removeServiceRecord = function (id) {
           return a({
             url: "app/servicedetail/remove/"+id,

@@ -37,7 +37,12 @@ public class RequestRecordVo {
 	 * 总耗时
 	 */
 	private Double spendTime;
-
+	/**
+	 * 所属厂家
+	 */
+	private String manufacturer;
+	
+	
 	public int getRanking() {
 		return ranking;
 	}
@@ -98,6 +103,14 @@ public class RequestRecordVo {
 
 	public void setResource(String resource) {
 		this.resource = resource;
+	}
+
+	public String getManufacturer() {
+		return manufacturer;
+	}
+
+	public void setManufacturer(String manufacturer) {
+		this.manufacturer = manufacturer;
 	}
 	
 	

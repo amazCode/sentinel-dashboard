@@ -1,0 +1,45 @@
+<div>
+  <span class="brand" style="font-weight:bold;">{{requestDetailDialog.title}}</span>
+  <div class="card" style="margin-top: 10px;margin-bottom: 5px;">
+     <div class="inputs-header">
+         <!--   <button class="btn btn-default-inverse" ng-click="reStatisticsInterface()"
+           style="float: right;margin-right: 10px;height: 30px;font-size: 12px;" >
+                          重新统计该服务接口</button> -->
+        </div>
+  
+    <div class="panel-body">
+        <div style=" height:500px; overflow:scroll; overflow-x:hidden;overflow-y: auto;">
+         <table class="table"   style="border-left: none; border-right:none;margin-top: -5px;padding-top: 1px;table-layout: fixed;">
+            <thead>
+              <tr style="background: #F3F5F7;">
+                <td>序号</td>
+                <td>地址</td>
+                 <td>请求时间</td>
+                <td>成功qps</td>
+                <td>通过qps</td>
+                <td>异常qps</td>
+                <td>记录数</td>
+                 <td>耗时(ms)</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr current-page="requestDetailPageConfig.currentPageIndex" 
+              dir-paginate="entry in requestDetailList | orderBy:'-count' | itemsPerPage: requestDetailPageConfig.pageSize "
+                pagination-id="entriesPagination">
+                <td style="word-wrap:break-word;word-break:break-all;">{{$index+1}}</td>
+                <td style="white-space:nowrap;overflow:hidden;text-overflow: ellipsis" title="{{entry.resource}}">{{entry.resource}} </td>
+                 <td>{{entry.gmtCreate | date:'yyyy-MM-dd HH:mm:ss'}}</td>
+                <td >{{entry.successQps}} </td>
+                <td >{{entry.passQps}} </td>
+                <td >{{entry.exceptionQps}} </td>
+                <td  >{{entry.count}}</td>
+                <td > {{entry.rt}} </td>
+              </tr>
+            </tbody>
+          </table>
+         </div>
+        </div>
+      <div class="separator"></div>
+   
+  </div>
+</div>

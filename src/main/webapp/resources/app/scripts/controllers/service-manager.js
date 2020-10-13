@@ -74,7 +74,7 @@ app.controller('ServiceManagerCtl', ['$scope', '$stateParams', 'MachineService',
           
         function addRule(rule) {
         	MachineService.saveRule(rule).success(function (data) {
-                if (data.code === 0) {
+                if (data.code == 0) {
               	  $scope.reloadServiceDetails();
               	serviceDetailDialog.close();
                 } else {
@@ -85,6 +85,7 @@ app.controller('ServiceManagerCtl', ['$scope', '$stateParams', 'MachineService',
         
         
         $scope.editServiceRecords = function (entity) {//服务详细
+//        	 $("#save").hide();
         	 $scope.currentService =  angular.copy(entity);
         	 $scope.interfacePageConfig = {
            	      currentPageIndex: 1,
@@ -103,7 +104,7 @@ app.controller('ServiceManagerCtl', ['$scope', '$stateParams', 'MachineService',
               overlay: true,
               scope: $scope
             });
-            MachineService.getServiceListByServiceRecord(entity.id).success(
+            MachineService.getServiceListByServiceRecord(entity.id,entity.serviceName).success(
                 function (data) {
                   if (data.code == 0 && data.data) {
                     $scope.serviceList = data.data;
@@ -130,6 +131,42 @@ app.controller('ServiceManagerCtl', ['$scope', '$stateParams', 'MachineService',
                       }
                      );
           };
+          
+          $scope.editInterfaceTest = function(id,urlName,description) {
+        	  if (id == null || id == undefined || id == '') {
+             	 alert("操作出现异常，刷新页面重试，或者联系管理员");
+                  return;
+             }
+        	  MachineService.saveInterface(id,urlName,description).success(
+        			  function(data){
+        				  if (data.code == 0) {
+        					  alert('成功：' + data.msg);
+        	                } else {
+        	                  alert('失败：' + data.msg);
+        	                }
+        			  }
+              )
+//              alert('ce'+id);
+          }
+          
+          $(document).on('click', '#save', function () {
+//        	  $("#edit").show();
+//       	   $("#save").hide();
+              var urlName=$(this).parents("tr").find("td").eq(1).text(); //接口名
+              var description=$(this).parents("tr").find("td").eq(3).text();//描述
+              var id = $(this).parents("tr").find("td").eq(8).text();//id
+//              alert(urlName+'   '+description+'  '+id);
+              $scope.editInterfaceTest(id,urlName,description);
+              
+         })
+         
+          $(document).on('click', '#edit', function (id) {
+        	  alert('接口名和接口描述点击可更改')
+//        	  $("#save").show();
+//        	  $("#edit").hide();
+//              
+         })
+          
           
         $scope.onOpenAdvanceClick = function () {
             $scope.serviceDetailDialog.showAdvanceButton = false;

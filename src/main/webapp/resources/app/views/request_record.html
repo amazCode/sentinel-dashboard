@@ -15,8 +15,9 @@
       <div class="card">
         <div class="inputs-header">
           <span class="brand" style="font-size: 13px;">请求排行</span>
-         <!--  <span>实例总数 {{machines.length}}, 健康 {{healthyCount}}, 失联 {{machines.length - healthyCount}}.</span> -->
-           <button class="btn btn-outline-primary" style="float: right;margin-right: 10px;height: 30px;font-size: 12px;" >统计-未完善-筛选接口</button>
+          <input class="form-control witdh-200" placeholder="关键字" ng-model="searchKey">
+           <button title="刷新"  ng-click="reloadMachines()"  class="btn btn-outline-primary" style="float: right;margin-right: 10px;height: 30px;font-size: 12px;"  >
+            <i class="fa fa-refresh"></i></button>
         </div>
 
         <!--.tools-header -->
@@ -31,11 +32,13 @@
                 <td>成功QPS</td>
                 <td>异常QPS</td>
                 <td>总耗时(ms)</td>
+                 <td>所属厂家</td>
+                <td>操作</td>
               </tr>
             </thead>
             <tbody>
               <tr current-page="machinesPageConfig.currentPageIndex" 
-              dir-paginate="entry in records |orderBy:countNum | itemsPerPage: machinesPageConfig.pageSize "
+              dir-paginate="entry in records | filter:searchKey |orderBy:countNum | itemsPerPage: machinesPageConfig.pageSize "
                 pagination-id="entriesPagination"><!--dir-paginate="entry in machines | filter : searchKey | itemsPerPage: machinesPageConfig.pageSize "   -->
                 <td style="word-wrap:break-word;word-break:break-all;">{{ entry.ranking}}</td>
                 <td style="word-wrap:break-word;word-break:break-all;">{{entry.resource}}</td>
@@ -44,9 +47,10 @@
                 <td >{{entry.success_qps}} </td>
                 <td >{{entry.exception_qps}} </td>
                 <td>{{entry.spendTime}}</td>
-                <!-- <td>
-                    <button ng-if="!entry.healthy" class="btn btn-xs btn-outline-danger" style="height: 25px; font-size: 12px;" ng-click="removeMachine(entry.ip, entry.port)">移除</button>
-                </td> -->
+                <td > {{entry.manufacturer}}</td>
+                 <td>
+                     <button class="btn btn-xs btn-outline-primary" type="button" ng-click="requestDetail(entry)" style="font-size: 12px; height:25px;">详细</button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -74,24 +78,5 @@
   </div>
   <!-- -->
 </div>
-
-<!-- <script type="text/javascript">
-var app = angular.module('sentinelDashboardApp');
-app.service('RequestRecordServiceT', ['$http',
-	  function ($http) {
-	    this.getRequestRecords = function (x) {
-	      return $http({
-	        url: 'record/' + app +'/requestrecord.json',
-	        method: 'GET'
-	      });
-	    }
-	  }]
-	);
-app.controller('RequestRecordCtl', function($scope,RequestRecordServiceT){
-	$scope.hex = RequestRecordServiceT.getRequestRecords('aa');
-});
-</script> -->
-
-
 
 <!-- .container-fluid -->

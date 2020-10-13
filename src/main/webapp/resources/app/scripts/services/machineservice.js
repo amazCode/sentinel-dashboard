@@ -14,17 +14,32 @@ app.service('MachineService', ['$http', '$httpParamSerializerJQLike',
           method: 'GET'
         });
       };
-      
+      this.getServiceListByServiceRecord = function (id,name) {
+          return $http({
+            url: 'app/list/service/'+id+'/'+name,
+            method: 'GET'
+          })
+        };
       this.getServiceDetails = function () {
           return $http({
             url: 'app/servicedetail.json',
             method: 'GET'
           });
         };
-      
-        this.getServiceListByServiceRecord = function (id) {
+        this.getRequestDetail = function () {
             return $http({
-              url: 'app/list/service/'+id,
+              url: 'app/servicedetail.json',
+              method: 'GET'
+            });
+          };
+        
+        this.getRequestDetail = function (entity) {
+        	var param = {
+        			resource:entity.resource
+        	}
+            return $http({
+              url: 'app/request/detail',
+              params: param,
               method: 'GET'
             });
           };
@@ -57,6 +72,21 @@ app.service('MachineService', ['$http', '$httpParamSerializerJQLike',
               method: 'GET'
           });
       }
+      
+      this.saveInterface = function (id,urlName,description) {
+    	  var param = {
+    			  id:id,
+    			  urlName:serviceName,
+    			  description:description
+    	  }
+    	  return $http({
+              url: 'app/service/interface/save',
+              params: param,
+              method: 'PUT'
+          });
+      }
+      
+      
       
       this.removeServiceRecord = function (id) {
           return $http({
