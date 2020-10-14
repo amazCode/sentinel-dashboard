@@ -21,7 +21,7 @@ app.controller('RequestRecordCtl', ['$scope', '$stateParams', 'MachineService', 
     };
     
     
-    $scope.requestDetail = function (entity) {//请求详细
+    $scope.requestDetail = function (entity,type) {//请求详细
     	$scope.requestDetailList ;
     	 $scope.requestDetailPageConfig = {
           	      currentPageIndex: 1,
@@ -41,7 +41,7 @@ app.controller('RequestRecordCtl', ['$scope', '$stateParams', 'MachineService', 
           scope: $scope
         });
         
-        MachineService.getRequestDetail(entity).success(
+        MachineService.getRequestDetail(entity,type).success(
                 function (data) {
                   if (data.code == 0 && data.data) {
                     $scope.requestDetailList = data.data;
@@ -54,8 +54,8 @@ app.controller('RequestRecordCtl', ['$scope', '$stateParams', 'MachineService', 
     
     
     
-    $scope.test = function() {
-    	return 'test';
+    $scope.exceptionRequest = function() {
+    	alert( 'test');
     }
     
     $scope.reloadMachines = function() {

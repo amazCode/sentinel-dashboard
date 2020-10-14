@@ -7,14 +7,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.IdentifiedEntity;
+
 @Entity
 @Table(name = "t_service_detail")
-public class ServiceDetailEntity {
+public class ServiceDetailEntity  extends IdentifiedEntity{
 
 	
-	@Id
-	@GeneratedValue
-    private Long id;
+//	@Id
+//    private Long id;
 	/**
 	 * 服务名称
 	 */
@@ -44,15 +45,6 @@ public class ServiceDetailEntity {
 	 */
     private Byte serviceStatus = 1 ;	
 
-	public Long getId() {
-		return id;
-	}
-
-
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 
 

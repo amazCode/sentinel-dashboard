@@ -21,7 +21,7 @@ import com.alibaba.csp.sentinel.dashboard.datasource.entity.MetricEntity;
 
 /**
  * Repository interface for aggregated metrics data.
- *
+ *用于聚合度量数据的存储库接口。
  * @param <T> type of metrics
  * @author Eric Zhao
  */

@@ -132,7 +132,7 @@ app.controller('ServiceManagerCtl', ['$scope', '$stateParams', 'MachineService',
                      );
           };
           
-          $scope.editInterfaceTest = function(id,urlName,description) {
+          $scope.editInterface = function(id,urlName,description) {
         	  if (id == null || id == undefined || id == '') {
              	 alert("操作出现异常，刷新页面重试，或者联系管理员");
                   return;
@@ -156,7 +156,7 @@ app.controller('ServiceManagerCtl', ['$scope', '$stateParams', 'MachineService',
               var description=$(this).parents("tr").find("td").eq(3).text();//描述
               var id = $(this).parents("tr").find("td").eq(8).text();//id
 //              alert(urlName+'   '+description+'  '+id);
-              $scope.editInterfaceTest(id,urlName,description);
+              $scope.editInterface(id,urlName,description);
               
          })
          

@@ -33,9 +33,10 @@ app.service('MachineService', ['$http', '$httpParamSerializerJQLike',
             });
           };
         
-        this.getRequestDetail = function (entity) {
+        this.getRequestDetail = function (entity,type) {
         	var param = {
-        			resource:entity.resource
+        			resource:entity.resource,
+        			type:type
         	}
             return $http({
               url: 'app/request/detail',

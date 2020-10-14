@@ -1,12 +1,9 @@
 package com.alibaba.csp.sentinel.dashboard.repository.metric;
 
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,11 +17,12 @@ import javax.transaction.Transactional;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.IdentifiedEntity;
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.gateway.ServiceInterfaceDetail;
 
 @Transactional
 @Component
-public class JpaEntityManager  {
+public class JpaEntityManager   {
 
 	public static final String QueryHint_Name ="org.hibernate.cacheable";
 	public static final String QueryHint_GRAPH ="javax.persistence.loadgraph";
@@ -37,7 +35,7 @@ public class JpaEntityManager  {
 		em.persist(t);
 	}
 	
-	public <T> T createOrUpdate(T bean, Class<T> T) {
+	public <T> T createOrUpdate(T bean) {
 		return em.merge(bean);
 	}
 	
@@ -52,6 +50,13 @@ public class JpaEntityManager  {
 		return t;
 	}
 	
+	public <T> T delete(T t) {
+		if (null != t)
+			em.remove(t);
+		return t;
+	}
+	
+	
 	public <T> T findById(Object id, Class<T> T) {
 		T t = em.find(T, id);
 		return t;
@@ -63,6 +68,78 @@ public class JpaEntityManager  {
 	}
 	
 	/**
+	 * 条件in查找
+	 * 
+	 * @param queryFieldName
+	 *            只能为实体对象一个属性
+	 * @param array
+	 *            in范围的数组
+	 * @param T
+	 * @return
+	 */
+	public <T> List<T> findByConditionIN(String queryFieldName, Object[] array,
+			Class<T> T) {
+		
+		return findByConditionIN(queryFieldName,array,null,null,T);
+	}
+	
+	/**
+	 * @param queryFieldName 只能为实体对象一个属性
+	 * @param array in范围的数组
+	 * @param T
+	 * @param range range 结果范围 [startIndex,endIndex]
+	 * @param orderby
+	 *            完整写法比如“ order by id desc,name asc”
+	 * @return
+	 */
+	public <T> List<T> findByConditionIN(String queryFieldName, Object[] array,
+			int[] range, String orderby, Class<T> T) {
+
+		return findByConditionIN(queryFieldName, array,
+				range,  orderby, false,T);
+	}
+	
+	/**
+	 * @param queryFieldName 只能为实体对象一个属性
+	 * @param array in范围的数组
+	 * @param T
+	 * @param range range 结果范围 [startIndex,endIndex]
+	 * @param orderby
+	 *            完整写法比如“ order by id desc,name asc”
+	 * @param cacheable
+	 *           是否使用二级缓存
+	 * @return
+	 */
+	public <T> List<T> findByConditionIN(String queryFieldName, Object[] array,
+			int[] range, String orderby, boolean cacheable,Class<T> T) {
+		if (array == null || array.length == 0) {
+			return new ArrayList<>();
+		}
+		String sql = "FROM " + T.getSimpleName() + " ";
+		if (!StringUtils.isEmpty(queryFieldName)) {
+			queryFieldName = formatSql4Jpa(queryFieldName);
+			sql = sql + " WHERE " + queryFieldName + " in :Masks";
+		}
+		
+		if (!StringUtils.isEmpty(orderby)) {
+			sql = sql + " " + orderby;
+		}
+		
+		TypedQuery<T> query = em.createQuery(sql, T);
+		query.setParameter("Masks", Arrays.asList(array));
+		if (range != null && range[1] > range[0]) {
+			query.setMaxResults(range[1] - range[0]);
+			query.setFirstResult(range[0]);
+		}
+		if(cacheable) {
+			query.setHint(QueryHint_Name, QueryHint_Value);
+		}
+		
+		return query.getResultList();
+	}
+
+	/**
+	 * 批量保存
 	 * @param <T>
 	 * @return 
 	 * 
@@ -70,12 +147,15 @@ public class JpaEntityManager  {
 	public <T>   boolean persistentBatch( List<ServiceInterfaceDetail> interfaceDetails)
 			throws SQLException {
 		 for (Object table : interfaceDetails){
-	            em.persist(table);
+	            em.merge(table);
 	        }
 	        em.flush();
 	        em.clear();
 			return true;
 	}
+	
+	
+	
 	/**
 	 * @param T
 	 * @param whereClause

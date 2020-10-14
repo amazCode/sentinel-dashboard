@@ -30,7 +30,7 @@
                 <td>总记录数</td>
                 <td>通过QPS</td>
                 <td>成功QPS</td>
-                <td>异常QPS</td>
+               <td >  异常QPS</td>
                 <td>总耗时(ms)</td>
                  <td>所属厂家</td>
                 <td>操作</td>
@@ -43,13 +43,13 @@
                 <td style="word-wrap:break-word;word-break:break-all;">{{ entry.ranking}}</td>
                 <td style="word-wrap:break-word;word-break:break-all;">{{entry.resource}}</td>
                 <td> {{entry.countNum}} </td>
-                <td> {{entry.pass_qps}} </td>
-                <td >{{entry.success_qps}} </td>
-                <td >{{entry.exception_qps}} </td>
+                <td> <a ng-click="requestDetail(entry,'pass')" href="javascript:void()"   style="color:blue;">{{entry.pass_qps}}</a> </td>
+                <td ><a ng-click="requestDetail(entry,'success')" href="javascript:void()"   style="color:blue;">{{entry.success_qps}} </a></td>
+                <td > <a ng-click="requestDetail(entry,'exception')" href="javascript:void()"   style="color:red;">{{entry.exception_qps}} </a></td>
                 <td>{{entry.spendTime}}</td>
                 <td > {{entry.manufacturer}}</td>
                  <td>
-                     <button class="btn btn-xs btn-outline-primary" type="button" ng-click="requestDetail(entry)" style="font-size: 12px; height:25px;">详细</button>
+                     <button class="btn btn-xs btn-outline-primary" type="button" ng-click="requestDetail(entry,'normal')" style="font-size: 12px; height:25px;">详细</button>
                 </td>
               </tr>
             </tbody>

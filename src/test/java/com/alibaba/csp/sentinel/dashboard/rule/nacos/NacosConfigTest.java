@@ -31,7 +31,7 @@ import org.springframework.context.annotation.Configuration;
  * @since 1.4.0
  */
 @Configuration
-public class NacosConfig {
+public class NacosConfigTest {
 
     @Bean
     public Converter<List<FlowRuleEntity>, String> flowRuleEntityEncoder() {

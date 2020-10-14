@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 /**
  * Caches metrics data in a period of time in memory.
- *
+ *在内存中缓存一段时间内的度量数据。
  * @author Carpenter Lee
  * @author Eric Zhao
  */

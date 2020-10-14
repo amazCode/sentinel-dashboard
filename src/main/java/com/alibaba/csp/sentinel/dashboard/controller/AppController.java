@@ -117,10 +117,31 @@ public class AppController {
 		return result;
     }
     @GetMapping(value = "/request/detail")
-    public Result<List<MetricEntity>> getRequestDetails(String resource) {
+    public Result<List<MetricEntity>> getRequestDetails(String resource,String type) {
     	log.info("调用的接口：  "+"/app/request/detail");
     	List<MetricEntity>  serviceDetails = em.findByCondition(MetricEntity.class, " resource =?1  ", new Object[] {resource});
-    	Result<List<MetricEntity>> result =  Result.ofSuccess(serviceDetails);
+    	Result<List<MetricEntity>> result;
+		if("normal".equals(type)) {
+    		result =  Result.ofSuccess(serviceDetails);
+    	}else if("exception".equals(type)) {
+    		serviceDetails = serviceDetails.stream()
+    				.filter(MetricEntity -> MetricEntity.getExceptionQps()>0)
+    				.sorted(Comparator.comparing(MetricEntity::getExceptionQps).reversed())
+    				.collect(Collectors.toList());
+    	}else if("pass".equals(type)) {
+    		serviceDetails = serviceDetails.stream()
+    				.filter(MetricEntity -> MetricEntity.getPassQps()>0)
+    				.sorted(Comparator.comparing(MetricEntity::getPassQps).reversed())
+    				.collect(Collectors.toList());
+    	}else if("success".equals(type)) {
+    		serviceDetails = serviceDetails.stream()
+    				.filter(MetricEntity -> MetricEntity.getSuccessQps()>0)
+    				.sorted(Comparator.comparing(MetricEntity::getSuccessQps).reversed())
+    				.collect(Collectors.toList());
+    	}
+    	
+    	result =  Result.ofSuccess(serviceDetails);
+    	
 		return result;
     }
     @GetMapping(value = "/list/service/{id}/{name}")
@@ -141,17 +162,8 @@ public class AppController {
          			 .filter(MetricEntity ->  MetricEntity.getResource().split("/")[1].equals(name) )
          			 .collect(Collectors.groupingBy(MetricEntity::getResource));
          	 List<ServiceInterfaceDetail> interfaceDetails =  statisticsServiceInterface(metricMap,id);
-//	    	List<ServiceInterfaceDetail>  serviceDetails = em.findByCondition(ServiceInterfaceDetail.class, " serviceId =?1 and serviceStatus = 1 ", new Object[] {String.valueOf(id)});
-//	    	Object[] arr = new Object[serviceDetails.size()] ;
-//	    	for (int i = 0; i < serviceDetails.size(); i++) {
-//	    		arr[i] = serviceDetails.get(i).getUrlAddress();
-//			}
-//	    	List<MetricEntity> metrics = em.findByConditionIN("resource", arr, MetricEntity.class)   ; 	
-//	    	//刚开始 按照现有的统计出的接口进行更新数据  点击重新统计以后再统计所有接口 然后只新增无的接口
-//			 Map<String, List<MetricEntity>>  metricMap = metrics.stream()
-//	    			 .collect(Collectors.groupingBy(MetricEntity::getResource));
-//	    	 List<ServiceInterfaceDetail> interfaceDetails =  statisticsServiceInterface(metricMap,id);
-//	    	 updateServiceInterface(interfaceDetails,serviceDetails);
+	    	List<ServiceInterfaceDetail>  serviceDetails = em.findByCondition(ServiceInterfaceDetail.class, " serviceId =?1 and serviceStatus = 1 ", new Object[] {String.valueOf(id)});
+	    	 interfaceDetails = updateServiceInterface(interfaceDetails,serviceDetails);
 			em.persistentBatch(interfaceDetails);
 			result =  Result.ofSuccess(interfaceDetails);
 			return result;
@@ -162,49 +174,10 @@ public class AppController {
     }
     @GetMapping(value = "/service/interface/restatistics")
     public Result<List<ServiceInterfaceDetail>> restatisticsServiceInterface( Long id,String name,boolean status) throws SQLException {
-    	
-    	
-    	
     	log.info("调用的接口：  "+"/app/service/interface/restatistics");
-    	
     	Result<List<ServiceInterfaceDetail>> result = getServiceListByServiceRecord(id, name);
-    	
-//    	if(StringUtils.isBlank(String.valueOf(id))||StringUtils.isBlank(name)) {
-//    		log.error("/app/service/interface/restatistics 检查该接口，参数为空");
-//    		return null;d
-//    	}
-//    	String serviceNameMatch = "/"+name+"/";
-//    	Result<List<ServiceInterfaceDetail>> result = null ;
-//    	try {
-//    		List<MetricEntity> metrics = em.findByCondition(MetricEntity.class, " resource like '%"+serviceNameMatch+"%'", new Object[] {});
-//    		if(CollectionUtils.isEmpty(metrics))
-//    			return Result.ofSuccessMsg("未找到该服务的相关接口");
-//        	log.info("正在统计接口的服务的名称："+metrics.get(0).getResource().split("/")[1]);
-//        	 Map<String, List<MetricEntity>>  metricMap = metrics.stream()
-//        			 .filter(MetricEntity ->  MetricEntity.getResource().split("/")[1].equals(name) )
-//        			 .collect(Collectors.groupingBy(MetricEntity::getResource));
-//        	 List<ServiceInterfaceDetail> interfaceDetails =  statisticsServiceInterface(metricMap,id);
-//        		List<ServiceInterfaceDetail>  serviceDetails = em.findByCondition(ServiceInterfaceDetail.class, " serviceId =?1 and serviceStatus = 1 ", new Object[] {String.valueOf(id)});
-//        	 if(status) {//如果为true  删除历史统计   
-//        		 em.delete(ServiceInterfaceDetail.class, " serviceId =?1 and serviceStatus = 1 ", new Object[] {String.valueOf(id)});
-//        		 serviceDetails.clear();
-//        	 }else {//为false  不删除 只更新
-////        		 em.executeUpdate(" update ServiceInterfaceDetail set serviceStatus = 0  where serviceId = "+String.valueOf(id));
-//        		 compareAndRemoveServiceInterfaceDetail(interfaceDetails,serviceDetails);
-//        	 }
-//        	 //先查数据表中该服务下的所有接口  只添加上新统计的即可
-//        	em.persistentBatch( interfaceDetails);
-//        	interfaceDetails.addAll(serviceDetails);
-//        	result =  Result.ofSuccess(interfaceDetails);
-//    	}catch(Exception e) {
-//    		log.error("统计该服务的接口出现异常：服务id为："+id);
-//    		return null;
-//    	}
 		return result;
     }
-    
-    
-   
 
 	@PutMapping(value = "/service/interface/save")
     public Result<String> editInterface( Long id,String urlName,String description) throws SQLException {
@@ -215,7 +188,7 @@ public class AppController {
         		detail.setUrlName(urlName);
         		detail.setDescription(description);
         	}
-        	em.createOrUpdate(detail, ServiceInterfaceDetail.class);
+        	em.createOrUpdate(detail);
         	return Result.ofSuccessMsg("success");
     	}catch(Exception e) {
     		return Result.ofFail(500, "操作失败，该条数据异常");
@@ -258,7 +231,7 @@ public class AppController {
     		entity.setManufacturer(manufacturer);
     		entity.setServiceName(serviceName);
     		entity.setCreateDate(new Date());
-        	em.createOrUpdate(entity,ServiceDetailEntity.class);
+        	em.createOrUpdate(entity);
     	}catch(Exception e) {
     		throw new Exception("服务新增失败");
     	}
@@ -346,21 +319,26 @@ public class AppController {
      * 更新接口信息
      * @param interfaceDetails 新统计的接口信息
      * @param serviceDetails 上一次统计的接口信息
+     * @return 
      */
-    private void updateServiceInterface(List<ServiceInterfaceDetail> interfaceDetails,
+    private List<ServiceInterfaceDetail> updateServiceInterface(List<ServiceInterfaceDetail> interfaceDetails,
 			List<ServiceInterfaceDetail> serviceDetails) {
-    		for (ServiceInterfaceDetail detail : serviceDetails) {
-				for (ServiceInterfaceDetail newDetail : interfaceDetails) {
-					if(newDetail.getUrlAddress().equals(detail.getUrlAddress())) {
-						detail.setCountNum(newDetail.getCountNum());
-						detail.setException_qps(newDetail.getException_qps());
-						detail.setPass_qps(newDetail.getPass_qps());
-						detail.setRanking(newDetail.getRanking());
-						detail.setSpendTime(newDetail.getSpendTime());
-						detail.setSuccess_qps(newDetail.getSuccess_qps());
+    		for (ServiceInterfaceDetail newDetail : interfaceDetails) {
+				for (ServiceInterfaceDetail old : serviceDetails) {
+					if(old.getUrlAddress().equals(newDetail.getUrlAddress())) {
+						newDetail.setDescription(old.getDescription());
+						newDetail.setUrlName(old.getUrlName());
+						newDetail.setId(old.getId());
+//						detail.setCountNum(newDetail.getCountNum());
+//						detail.setException_qps(newDetail.getException_qps());
+//						detail.setPass_qps(newDetail.getPass_qps());
+//						detail.setRanking(newDetail.getRanking());
+//						detail.setSpendTime(newDetail.getSpendTime());
+//						detail.setSuccess_qps(newDetail.getSuccess_qps());
 					}
 				}
 			}
+			return interfaceDetails;
 	}
     /**
      * 构造前台显示的vo

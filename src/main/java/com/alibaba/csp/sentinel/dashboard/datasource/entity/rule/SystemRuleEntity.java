@@ -19,11 +19,19 @@ import com.alibaba.csp.sentinel.slots.system.SystemRule;
 
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 /**
  * @author leyou
  */
+@Entity
+@Table(name = "t_system_rule")
 public class SystemRuleEntity implements RuleEntity {
 
+	@Id
     private Long id;
 
     private String app;

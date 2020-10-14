@@ -585,9 +585,10 @@ function(a, o) {
             method: "GET"
           })
         },
-        this.getRequestDetail = function (entity) {
+        this.getRequestDetail = function (entity,type) {
         	var param = {
-        			resource:entity.resource
+        			resource:entity.resource,
+        			type:type
         	}
             return a({
               url: "app/request/detail",
