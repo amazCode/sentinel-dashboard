@@ -169,12 +169,12 @@ public class AuthorityRuleController {
         if (id == null) {
             return Result.ofFail(-1, "id cannot be null");
         }
-        AuthorityRuleEntity oldEntity = repository.findById(id);
+        AuthorityRuleEntity oldEntity = repository.findById(id,AuthorityRuleEntity.class);
         if (oldEntity == null) {
             return Result.ofSuccess(null);
         }
         try {
-            repository.delete(id);
+            repository.delete(id,AuthorityRuleEntity.class);
         } catch (Exception e) {
             return Result.ofFail(-1, e.getMessage());
         }

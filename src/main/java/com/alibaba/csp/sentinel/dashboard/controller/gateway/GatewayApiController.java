@@ -176,7 +176,7 @@ public class GatewayApiController {
             return Result.ofFail(-1, "id can't be null");
         }
 
-        ApiDefinitionEntity entity = repository.findById(id);
+        ApiDefinitionEntity entity = repository.findById(id,ApiDefinitionEntity.class);
         if (entity == null) {
             return Result.ofFail(-1, "api does not exist, id=" + id);
         }
@@ -234,13 +234,13 @@ public class GatewayApiController {
             return Result.ofFail(-1, "id can't be null");
         }
 
-        ApiDefinitionEntity oldEntity = repository.findById(id);
+        ApiDefinitionEntity oldEntity = repository.findById(id,ApiDefinitionEntity.class);
         if (oldEntity == null) {
             return Result.ofSuccess(null);
         }
 
         try {
-            repository.delete(id);
+            repository.delete(id,ApiDefinitionEntity.class);
         } catch (Throwable throwable) {
             logger.error("delete gateway api error:", throwable);
             return Result.ofThrowable(-1, throwable);

@@ -17,12 +17,23 @@ package com.alibaba.csp.sentinel.dashboard.datasource.entity.rule;
 
 import java.util.Date;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 /**
  * @author leyou
  */
+
+@Entity
+@Table(name = "t_degrade_rule")
 public class DegradeRuleEntity implements RuleEntity {
+	@Id
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     private String app;
     private String ip;

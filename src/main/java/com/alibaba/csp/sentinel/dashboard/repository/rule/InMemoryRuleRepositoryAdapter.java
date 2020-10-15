@@ -75,7 +75,7 @@ public abstract class InMemoryRuleRepositoryAdapter<T extends RuleEntity> implem
     }
 
     @Override
-    public T delete(Long id) {
+    public T delete(Long id,Class<T> t) {
         T entity = allRules.remove(id);
         if (entity != null) {
             if (appRules.get(entity.getApp()) != null) {
@@ -87,7 +87,7 @@ public abstract class InMemoryRuleRepositoryAdapter<T extends RuleEntity> implem
     }
 
     @Override
-    public T findById(Long id) {
+    public T findById(Long id,Class<T> t) {
         return allRules.get(id);
     }
 
@@ -101,7 +101,7 @@ public abstract class InMemoryRuleRepositoryAdapter<T extends RuleEntity> implem
     }
 
     @Override
-    public List<T> findAllByApp(String appName) {
+    public List<T> findAllByApp(String appName,Class<T> t) {
         AssertUtil.notEmpty(appName, "appName cannot be empty");
         Map<Long, T> entities = appRules.get(appName);
         if (entities == null) {

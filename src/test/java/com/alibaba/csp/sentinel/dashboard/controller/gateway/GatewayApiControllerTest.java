@@ -153,7 +153,7 @@ public class GatewayApiControllerTest {
         assertEquals(entities, data);
 
         // Verify the entities are add into memory repository
-        List<ApiDefinitionEntity> entitiesInMem = repository.findAllByApp(TEST_APP);
+        List<ApiDefinitionEntity> entitiesInMem = repository.findAllByApp(TEST_APP,ApiDefinitionEntity.class);
         assertEquals(2, entitiesInMem.size());
         assertEquals(entities, entitiesInMem);
     }
@@ -210,7 +210,7 @@ public class GatewayApiControllerTest {
         assertEquals("/product", predicateItemEntity.getPattern());
 
         // Verify the entity which is add in memory repository
-        List<ApiDefinitionEntity> entitiesInMem = repository.findAllByApp(TEST_APP);
+        List<ApiDefinitionEntity> entitiesInMem = repository.findAllByApp(TEST_APP,ApiDefinitionEntity.class);
         assertEquals(1, entitiesInMem.size());
         assertEquals(entity, entitiesInMem.get(0));
     }
@@ -278,7 +278,7 @@ public class GatewayApiControllerTest {
         assertEquals("/my_order", predicateItemEntity.getPattern());
 
         // Verify the entity which is update in memory repository
-        List<ApiDefinitionEntity> entitiesInMem = repository.findAllByApp(TEST_APP);
+        List<ApiDefinitionEntity> entitiesInMem = repository.findAllByApp(TEST_APP,ApiDefinitionEntity.class);
         assertEquals(1, entitiesInMem.size());
         assertEquals(entity, entitiesInMem.get(0));
     }
@@ -322,7 +322,7 @@ public class GatewayApiControllerTest {
         assertEquals(addEntity.getId(), result.getData());
 
         // Now no entities in memory
-        List<ApiDefinitionEntity> entitiesInMem = repository.findAllByApp(TEST_APP);
+        List<ApiDefinitionEntity> entitiesInMem = repository.findAllByApp(TEST_APP,ApiDefinitionEntity.class);
         assertEquals(0, entitiesInMem.size());
     }
 }

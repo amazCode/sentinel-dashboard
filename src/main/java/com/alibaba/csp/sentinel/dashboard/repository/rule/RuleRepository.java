@@ -48,7 +48,7 @@ public interface RuleRepository<T, ID> {
      * @param id
      * @return entity deleted
      */
-    T delete(ID id);
+    T delete(ID id,Class<T> t);
 
     /**
      * Find by id.
@@ -56,7 +56,7 @@ public interface RuleRepository<T, ID> {
      * @param id
      * @return
      */
-    T findById(ID id);
+    T findById(ID id,Class<T> t);
 
     /**
      * Find all by machine.
@@ -73,7 +73,7 @@ public interface RuleRepository<T, ID> {
      * @return all rules of the application
      * @since 1.4.0
      */
-    List<T> findAllByApp(String appName);
+    List<T> findAllByApp(String appName,Class<T> t);
 
     ///**
     // * Find all by app and enable switch.

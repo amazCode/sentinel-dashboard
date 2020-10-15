@@ -264,7 +264,7 @@ public class GatewayFlowRuleController {
             return Result.ofFail(-1, "id can't be null");
         }
 
-        GatewayFlowRuleEntity entity = repository.findById(id);
+        GatewayFlowRuleEntity entity = repository.findById(id,GatewayFlowRuleEntity.class);
         if (entity == null) {
             return Result.ofFail(-1, "gateway flow rule does not exist, id=" + id);
         }
@@ -405,13 +405,13 @@ public class GatewayFlowRuleController {
             return Result.ofFail(-1, "id can't be null");
         }
 
-        GatewayFlowRuleEntity oldEntity = repository.findById(id);
+        GatewayFlowRuleEntity oldEntity = repository.findById(id,GatewayFlowRuleEntity.class);
         if (oldEntity == null) {
             return Result.ofSuccess(null);
         }
 
         try {
-            repository.delete(id);
+            repository.delete(id,GatewayFlowRuleEntity.class);
         } catch (Throwable throwable) {
             logger.error("delete gateway flow rule error:", throwable);
             return Result.ofThrowable(-1, throwable);

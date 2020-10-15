@@ -26,12 +26,15 @@ import com.alibaba.csp.sentinel.slots.block.RuleConstant;
 import com.alibaba.csp.sentinel.util.StringUtil;
 
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.DegradeRuleEntity;
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.SystemRuleEntity;
 import com.alibaba.csp.sentinel.dashboard.domain.Result;
 import com.alibaba.csp.sentinel.dashboard.repository.rule.InMemDegradeRuleStore;
+import com.alibaba.csp.sentinel.dashboard.repository.rule.RuleRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,9 +48,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class DegradeController {
 
     private final Logger logger = LoggerFactory.getLogger(DegradeController.class);
-
-    @Autowired
-    private InMemDegradeRuleStore repository;
+   
+    @Autowired  
+    @Qualifier("ruleRepositoryAdapter")
+    private RuleRepository<DegradeRuleEntity, Long> repository;
+//    @Autowired
+//    private InMemDegradeRuleStore repository;
     @Autowired
     private SentinelApiClient sentinelApiClient;
 
@@ -66,8 +72,8 @@ public class DegradeController {
             return Result.ofFail(-1, "port can't be null");
         }
         try {
-            List<DegradeRuleEntity> rules = sentinelApiClient.fetchDegradeRuleOfMachine(app, ip, port);
-            rules = repository.saveAll(rules);
+//            List<DegradeRuleEntity> rules = sentinelApiClient.fetchDegradeRuleOfMachine(app, ip, port);
+        	 List<DegradeRuleEntity>   rules =  repository.findAllByApp(app,DegradeRuleEntity.class);
             return Result.ofSuccess(rules);
         } catch (Throwable throwable) {
             logger.error("queryApps error:", throwable);
@@ -144,7 +150,7 @@ public class DegradeController {
                 return Result.ofFail(-1, "Invalid grade: " + grade);
             }
         }
-        DegradeRuleEntity entity = repository.findById(id);
+        DegradeRuleEntity entity = repository.findById(id,DegradeRuleEntity.class);
         if (entity == null) {
             return Result.ofFail(-1, "id " + id + " dose not exist");
         }
@@ -190,13 +196,13 @@ public class DegradeController {
             return Result.ofFail(-1, "id can't be null");
         }
 
-        DegradeRuleEntity oldEntity = repository.findById(id);
+        DegradeRuleEntity oldEntity = repository.findById(id,DegradeRuleEntity.class);
         if (oldEntity == null) {
             return Result.ofSuccess(null);
         }
 
         try {
-            repository.delete(id);
+            repository.delete(id,DegradeRuleEntity.class);
         } catch (Throwable throwable) {
             logger.error("delete error:", throwable);
             return Result.ofThrowable(-1, throwable);

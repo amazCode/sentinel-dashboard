@@ -17,9 +17,7 @@ package com.alibaba.csp.sentinel.dashboard.datasource.entity;
 
 import java.util.Date;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -28,11 +26,10 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "t_sentinel_metric")
-public class MetricEntity {
-	
-	@Id
-	@GeneratedValue
-    private Long id;
+public class MetricEntity    extends IdentifiedEntity {
+
+//	@Id
+//    private Long id;
     private Date gmtCreate;
     private Date gmtModified;
     private String app;
@@ -107,14 +104,12 @@ public class MetricEntity {
         this.rt = avgRt * successQps;
         this.successQps = successQps;
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+//    public Long getId() {
+//        return id;
+//    }
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
 
     public Date getGmtCreate() {
         return gmtCreate;

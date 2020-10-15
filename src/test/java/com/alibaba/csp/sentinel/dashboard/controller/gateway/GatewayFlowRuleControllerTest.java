@@ -159,7 +159,7 @@ public class GatewayFlowRuleControllerTest {
         assertEquals(entities, data);
 
         // Verify the entities are add into memory repository
-        List<GatewayFlowRuleEntity> entitiesInMem = repository.findAllByApp(TEST_APP);
+        List<GatewayFlowRuleEntity> entitiesInMem = repository.findAllByApp(TEST_APP,GatewayFlowRuleEntity.class);
         assertEquals(2, entitiesInMem.size());
         assertEquals(entities, entitiesInMem);
     }
@@ -213,7 +213,7 @@ public class GatewayFlowRuleControllerTest {
         assertNotNull(entity.getGmtModified());
 
         // Verify the entity which is add in memory repository
-        List<GatewayFlowRuleEntity> entitiesInMem = repository.findAllByApp(TEST_APP);
+        List<GatewayFlowRuleEntity> entitiesInMem = repository.findAllByApp(TEST_APP,GatewayFlowRuleEntity.class);
         assertEquals(1, entitiesInMem.size());
         assertEquals(entity, entitiesInMem.get(0));
     }
@@ -351,7 +351,7 @@ public class GatewayFlowRuleControllerTest {
         assertEquals(addEntity.getId(), result.getData());
 
         // Now no entities in memory
-        List<GatewayFlowRuleEntity> entitiesInMem = repository.findAllByApp(TEST_APP);
+        List<GatewayFlowRuleEntity> entitiesInMem = repository.findAllByApp(TEST_APP,GatewayFlowRuleEntity.class);
         assertEquals(0, entitiesInMem.size());
     }
 }

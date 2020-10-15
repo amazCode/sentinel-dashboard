@@ -46,7 +46,7 @@ public class SystemController {
     private final Logger logger = LoggerFactory.getLogger(SystemController.class);
 
     @Autowired  
-    @Qualifier("persistenceRuleRepositoryAdapter")
+    @Qualifier("ruleRepositoryAdapter")
     private RuleRepository<SystemRuleEntity, Long> repository;
     @Autowired
     private SentinelApiClient sentinelApiClient;
@@ -77,7 +77,7 @@ public class SystemController {
         }
         try {
 //            List<SystemRuleEntity> rules = sentinelApiClient.fetchSystemRuleOfMachine(app, ip, port);
-        	 List<SystemRuleEntity> rules = repository.findAllByApp(app);
+        	 List<SystemRuleEntity> rules = repository.findAllByApp(app,SystemRuleEntity.class);
 //            rules = repository.saveAll(rules);
             return Result.ofSuccess(rules);
         } catch (Throwable throwable) {
@@ -169,7 +169,7 @@ public class SystemController {
         if (id == null) {
             return Result.ofFail(-1, "id can't be null");
         }
-        SystemRuleEntity entity = repository.findById(id);
+        SystemRuleEntity entity = repository.findById(id,SystemRuleEntity.class);
         if (entity == null) {
             return Result.ofFail(-1, "id " + id + " dose not exist");
         }
@@ -230,12 +230,12 @@ public class SystemController {
         if (id == null) {
             return Result.ofFail(-1, "id can't be null");
         }
-        SystemRuleEntity oldEntity = repository.findById(id);
+        SystemRuleEntity oldEntity = repository.findById(id,SystemRuleEntity.class);
         if (oldEntity == null) {
             return Result.ofSuccess(null);
         }
         try {
-            repository.delete(id);
+            repository.delete(id,SystemRuleEntity.class);
         } catch (Throwable throwable) {
             logger.error("delete error:", throwable);
             return Result.ofThrowable(-1, throwable);

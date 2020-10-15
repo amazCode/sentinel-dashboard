@@ -45,6 +45,8 @@ import com.alibaba.csp.sentinel.dashboard.discovery.MachineInfo;
 import com.alibaba.csp.sentinel.node.metric.MetricNode;
 import com.alibaba.csp.sentinel.util.StringUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.alibaba.csp.sentinel.dashboard.repository.metric.MetricsRepository;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -67,6 +69,7 @@ import org.springframework.stereotype.Component;
  *
  * @author leyou
  */
+@Slf4j
 @Component
 public class MetricFetcher {
 

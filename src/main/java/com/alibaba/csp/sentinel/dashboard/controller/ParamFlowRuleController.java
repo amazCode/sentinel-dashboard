@@ -194,7 +194,7 @@ public class ParamFlowRuleController {
         if (id == null || id <= 0) {
             return Result.ofFail(-1, "Invalid id");
         }
-        ParamFlowRuleEntity oldEntity = repository.findById(id);
+        ParamFlowRuleEntity oldEntity = repository.findById(id,ParamFlowRuleEntity.class);
         if (oldEntity == null) {
             return Result.ofFail(-1, "id " + id + " does not exist");
         }
@@ -233,13 +233,13 @@ public class ParamFlowRuleController {
         if (id == null) {
             return Result.ofFail(-1, "id cannot be null");
         }
-        ParamFlowRuleEntity oldEntity = repository.findById(id);
+        ParamFlowRuleEntity oldEntity = repository.findById(id,ParamFlowRuleEntity.class);
         if (oldEntity == null) {
             return Result.ofSuccess(null);
         }
 
         try {
-            repository.delete(id);
+            repository.delete(id,ParamFlowRuleEntity.class);
             publishRules(oldEntity.getApp(), oldEntity.getIp(), oldEntity.getPort()).get();
             return Result.ofSuccess(id);
         } catch (ExecutionException ex) {

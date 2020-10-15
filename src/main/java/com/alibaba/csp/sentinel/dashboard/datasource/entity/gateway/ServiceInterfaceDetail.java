@@ -7,6 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.IdentifiedEntity;
+
 /**
  * 服务接口详细 
  * @author xqw
@@ -14,12 +16,11 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "t_service_interface_detail")
-public class ServiceInterfaceDetail {
+public class ServiceInterfaceDetail   extends IdentifiedEntity{
 
 	
-	@Id
-	@GeneratedValue
-    private Long id;
+//	@Id
+//    private Long id;
 	/**
 	 * 接口名  如：故障档案接口
 	 */
@@ -69,13 +70,12 @@ public class ServiceInterfaceDetail {
 	 * 服务状态 1表示正在使用  0表示逻辑删除
 	 */
     private Byte serviceStatus = 1 ;	
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
+//	public Long getId() {
+//		return id;
+//	}
+//	public void setId(Long id) {
+//		this.id = id;
+//	}
 	public String getUrlAddress() {
 		return urlAddress;
 	}

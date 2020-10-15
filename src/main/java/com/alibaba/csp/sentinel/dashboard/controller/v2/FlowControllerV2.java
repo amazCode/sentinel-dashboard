@@ -167,7 +167,7 @@ public class FlowControllerV2 {
         if (id == null || id <= 0) {
             return Result.ofFail(-1, "Invalid id");
         }
-        FlowRuleEntity oldEntity = repository.findById(id);
+        FlowRuleEntity oldEntity = repository.findById(id,FlowRuleEntity.class);
         if (oldEntity == null) {
             return Result.ofFail(-1, "id " + id + " does not exist");
         }
@@ -206,13 +206,13 @@ public class FlowControllerV2 {
         if (id == null || id <= 0) {
             return Result.ofFail(-1, "Invalid id");
         }
-        FlowRuleEntity oldEntity = repository.findById(id);
+        FlowRuleEntity oldEntity = repository.findById(id,FlowRuleEntity.class);
         if (oldEntity == null) {
             return Result.ofSuccess(null);
         }
 
         try {
-            repository.delete(id);
+            repository.delete(id,FlowRuleEntity.class);
             publishRules(oldEntity.getApp());
         } catch (Exception e) {
             return Result.ofFail(-1, e.getMessage());
@@ -221,7 +221,7 @@ public class FlowControllerV2 {
     }
 
     private void publishRules(/*@NonNull*/ String app) throws Exception {
-        List<FlowRuleEntity> rules = repository.findAllByApp(app);
+        List<FlowRuleEntity> rules = repository.findAllByApp(app,FlowRuleEntity.class);
         rulePublisher.publish(app, rules);
     }
 }

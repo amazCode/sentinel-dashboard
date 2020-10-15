@@ -15,14 +15,15 @@
  */
 package com.alibaba.csp.sentinel.dashboard.datasource.entity.rule;
 
-import com.alibaba.csp.sentinel.slots.system.SystemRule;
-
 import java.util.Date;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import com.alibaba.csp.sentinel.slots.system.SystemRule;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 /**
  * @author leyou
@@ -32,6 +33,7 @@ import javax.persistence.Table;
 public class SystemRuleEntity implements RuleEntity {
 
 	@Id
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     private String app;

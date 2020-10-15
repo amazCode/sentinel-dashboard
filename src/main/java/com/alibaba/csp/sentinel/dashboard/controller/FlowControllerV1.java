@@ -168,7 +168,7 @@ public class FlowControllerV1 {
         if (id == null) {
             return Result.ofFail(-1, "id can't be null");
         }
-        FlowRuleEntity entity = repository.findById(id);
+        FlowRuleEntity entity = repository.findById(id,FlowRuleEntity.class);
         if (entity == null) {
             return Result.ofFail(-1, "id " + id + " dose not exist");
         }
@@ -245,13 +245,13 @@ public class FlowControllerV1 {
         if (id == null) {
             return Result.ofFail(-1, "id can't be null");
         }
-        FlowRuleEntity oldEntity = repository.findById(id);
+        FlowRuleEntity oldEntity = repository.findById(id,FlowRuleEntity.class);
         if (oldEntity == null) {
             return Result.ofSuccess(null);
         }
 
         try {
-            repository.delete(id);
+            repository.delete(id,FlowRuleEntity.class);
         } catch (Exception e) {
             return Result.ofFail(-1, e.getMessage());
         }
