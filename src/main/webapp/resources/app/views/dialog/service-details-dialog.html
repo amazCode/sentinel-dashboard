@@ -11,7 +11,7 @@
      <!--  <div class="row" style="margin-top: 20px; margin-bottom: 20px;"> -->
        <!--  <form role="form" class="form-horizontal"> -->
         <div style=" height:500px; overflow:scroll; overflow-x:hidden;overflow-y: auto;">
-         <table class="table"   style="border-left: none; border-right:none;margin-top: -5px;padding-top: 1px;" ><!-- table-layout: fixed; -->
+         <table class="table"   style="border-left: none; border-right:none;margin-top: -5px;padding-top: 1px;table-layout: fixed;"  ><!-- table-layout: fixed; -->
             <thead>
               <tr style="background: #F3F5F7;">
                 <td>序号</td>
@@ -28,10 +28,12 @@
             <tbody>
               <tr current-page="interfacePageConfig.currentPageIndex" 
               dir-paginate="entry in serviceList |orderBy:entry.createDate | itemsPerPage: interfacePageConfig.pageSize "
-                pagination-id="entriesPagination">
+                pagination-id="entriesServiceDetailPagination">
                 <td style="word-wrap:break-word;word-break:break-all;width:10px;">{{$index+1}}</td>
-                <td  id="urlName" style="word-wrap:break-word;word-break:break-all;width:10px;" contenteditable="true" ng-bind="{{entry.urlName}}">{{entry.urlName}}</td>
-                <td style="width:50px;">{{entry.urlAddress}} </td><!-- white-space:nowrap;overflow:hidden;text-overflow: ellipsis" title="{{entry.urlAddress}} -->
+                <td  id="urlName" style="word-wrap:break-word;word-break:break-all;width:10px;"  contenteditable="true">{{entry.urlName}}</td><!--contenteditable="true" ng-bind="{{entry.urlName}}" -->
+                <td style="width:100px;white-space:nowrap;overflow:hidden;text-overflow: ellipsis"
+                 title="{{entry.urlAddress}}" id="input"  >
+                 <a     ng-click="myFrame(entry.urlAddress)" href="javascript:void()">{{entry.urlAddress}} </a></td><!-- white-space:nowrap;overflow:hidden;text-overflow: ellipsis" title="{{entry.urlAddress}} -->
                  <td   style="width:50px;"  contenteditable="true"> {{entry.description}} </td>
                 <td style="width:5px;"> {{entry.success_qps}} </td>
                 <td style="width:5px;">{{entry.pass_qps}} </td>
@@ -50,6 +52,10 @@
       <!--   </form> -->
       <!-- </div> -->
       <div class="separator"></div>
+     <!-- <div id="mySframe" style="display: none; position: absolute; background-color: #7d8489; width: 150px;" ng-show="myFrameShow">
+               悬浮框内容
+      </div> -->
+     
    
   </div>
 </div>

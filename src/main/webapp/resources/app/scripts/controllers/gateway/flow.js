@@ -91,7 +91,7 @@ app.controller('GatewayFlowCtl', ['$scope', '$stateParams', 'GatewayFlowService'
         ip: mac[0],
         port: mac[1],
         resourceMode: 0,
-        interval: 1,
+        gatewayFlowRuleInterval: 1,
         intervalUnit: 0,
         controlBehavior: 0,
         burst: 0,

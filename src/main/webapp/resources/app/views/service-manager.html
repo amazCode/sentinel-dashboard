@@ -11,14 +11,16 @@
       <div class="card">
         <div class="inputs-header">
           <span class="brand" style="font-size: 13px;">服务管理</span>
+         
            <button class="btn btn-default-inverse" ng-click="addService()"
            style="float: right;margin-right: 10px;height: 30px;font-size: 12px;" >
             <i class="fa fa-plus"></i>新增</button>
+             <input class="form-control witdh-200" placeholder="关键字" ng-model="searchKey">
         </div>
 
         <!--.tools-header -->
         <div class="card-body" style="padding: 0px 0px;">
-          <table class="table" style="border-left: none; border-right:none;margin-top: 10px;">
+          <table class="table" style="border-left: none; border-right:none;margin-top: 10px;table-layout: fixed;">
             <thead>
               <tr style="background: #F3F5F7;">
                 <td>序号</td>
@@ -33,7 +35,7 @@
             </thead>
             <tbody>
               <tr current-page="machinesPageConfig.currentPageIndex" 
-              dir-paginate="entry in records |orderBy:entry.createDate | itemsPerPage: machinesPageConfig.pageSize "
+              dir-paginate="entry in records | filter:searchKey |orderBy:entry.createDate | itemsPerPage: machinesPageConfig.pageSize "
                 pagination-id="entriesPagination">
                 <td style="word-wrap:break-word;word-break:break-all;">{{$index+1}}</td>
                 <td style="word-wrap:break-word;word-break:break-all;">{{entry.serviceName}}</td>

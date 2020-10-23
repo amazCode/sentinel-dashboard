@@ -80,7 +80,15 @@ public class AppController {
     @GetMapping("/briefinfos.json")
     public Result<List<AppInfo>> queryAppInfos(HttpServletRequest request) {
         List<AppInfo> list = new ArrayList<>(appManagement.getBriefApps());
+        for (AppInfo appInfo : list) {
+			if("service-gateway".equals(appInfo.getApp())) {
+				appInfo.setAliasName("服务网关");
+			}else {
+				appInfo.setAliasName(appInfo.getApp());
+			}
+		}
         Collections.sort(list, Comparator.comparing(AppInfo::getApp));
+        
         return Result.ofSuccess(list);
     }
 
@@ -156,7 +164,7 @@ public class AppController {
     	 try {
     		 List<MetricEntity> metrics = em.findByCondition(MetricEntity.class, " resource like '%"+serviceNameMatch+"%'", new Object[] {});
      		if(CollectionUtils.isEmpty(metrics))
-     			return Result.ofSuccessMsg("未找到该服务的相关接口");
+     			return Result.ofFail(500,"未找到该服务的相关接口");
          	log.info("正在统计接口的服务的名称："+metrics.get(0).getResource().split("/")[1]);
          	 Map<String, List<MetricEntity>>  metricMap = metrics.stream()
          			 .filter(MetricEntity ->  MetricEntity.getResource().split("/")[1].equals(name) )

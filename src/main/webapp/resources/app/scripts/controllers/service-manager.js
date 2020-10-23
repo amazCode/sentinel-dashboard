@@ -110,6 +110,8 @@ app.controller('ServiceManagerCtl', ['$scope', '$stateParams', 'MachineService',
                     $scope.serviceList = data.data;
                     $scope.interfacePageConfig.totalCount = $scope.serviceList.length;
                     $scope.interfacePageConfig.pageSize = $scope.serviceList.length;
+                  }else {
+                	   $scope.serviceList = [];
                   }
                 }
               );
@@ -167,6 +169,24 @@ app.controller('ServiceManagerCtl', ['$scope', '$stateParams', 'MachineService',
 //              
          })
           
+        	   
+        $scope.myFrame = function (data) {
+//            $scope.serviceDetail = angular.copy(data);
+            $scope.urlAddressDialog = {
+            	value:data
+//              title: '编辑服务',
+//              type: 'edit',
+//              confirmBtnText: '保存'
+            };
+            urlAddressDialog = ngDialog.open({
+              template: '/app/views/dialog/url-address-dialog.html',
+              width: 500,
+              overlay: true,
+              scope: $scope
+            });
+          };
+         
+         
           
         $scope.onOpenAdvanceClick = function () {
             $scope.serviceDetailDialog.showAdvanceButton = false;

@@ -2,7 +2,7 @@ var app = angular.module('sentinelDashboardApp');
 
 app.controller('RequestRecordCtl', ['$scope', '$stateParams', 'MachineService', 'ngDialog',
   function ($scope, $stateParams, MachineService,ngDialog) {
-    $scope.app = $stateParams.app;
+    $scope.app = $stateParams.app;//'服务网关' ;
     $scope.propertyName = '';
     $scope.reverse = false;
     $scope.currentPage = 1;
@@ -26,7 +26,7 @@ app.controller('RequestRecordCtl', ['$scope', '$stateParams', 'MachineService', 
     	 $scope.requestDetailPageConfig = {
           	      currentPageIndex: 1,
 //          	      pageSize:10,
-          	      totalPage: 1,
+//          	      totalPage: 1,
           	      totalCount: 0,
           	    };
     	
@@ -46,7 +46,7 @@ app.controller('RequestRecordCtl', ['$scope', '$stateParams', 'MachineService', 
                   if (data.code == 0 && data.data) {
                     $scope.requestDetailList = data.data;
                     $scope.requestDetailPageConfig.totalCount = $scope.requestDetailList.length;
-                    $scope.requestDetailPageConfig.pageSize = $scope.requestDetailList.length;
+//                    $scope.requestDetailPageConfig.pageSize = $scope.requestDetailList.length;
                   }
                 }
               );

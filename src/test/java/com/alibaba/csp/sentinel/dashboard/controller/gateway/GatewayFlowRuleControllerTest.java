@@ -178,7 +178,7 @@ public class GatewayFlowRuleControllerTest {
 
         reqVo.setGrade(FLOW_GRADE_QPS);
         reqVo.setCount(5D);
-        reqVo.setInterval(30L);
+        reqVo.setGatewayFlowRuleInterval(30L);
         reqVo.setIntervalUnit(GatewayFlowRuleEntity.INTERVAL_UNIT_SECOND);
         reqVo.setControlBehavior(CONTROL_BEHAVIOR_DEFAULT);
         reqVo.setBurst(0);
@@ -254,7 +254,7 @@ public class GatewayFlowRuleControllerTest {
         reqVo.setApp(TEST_APP);
         reqVo.setGrade(FLOW_GRADE_QPS);
         reqVo.setCount(6D);
-        reqVo.setInterval(2L);
+        reqVo.setGatewayFlowRuleInterval(2L);
         reqVo.setIntervalUnit(GatewayFlowRuleEntity.INTERVAL_UNIT_MINUTE);
         reqVo.setControlBehavior(CONTROL_BEHAVIOR_RATE_LIMITER);
         reqVo.setMaxQueueingTimeoutMs(500);
@@ -286,7 +286,7 @@ public class GatewayFlowRuleControllerTest {
         assertEquals(RESOURCE_MODE_ROUTE_ID, entity.getResourceMode().intValue());
         assertEquals("httpbin_route", entity.getResource());
         assertEquals(6D, entity.getCount().doubleValue(), 0);
-        assertEquals(2L, entity.getInterval().longValue());
+        assertEquals(2L, entity.getGatewayFlowRuleInterval().longValue());
         assertEquals(GatewayFlowRuleEntity.INTERVAL_UNIT_MINUTE, entity.getIntervalUnit().intValue());
         assertEquals(CONTROL_BEHAVIOR_RATE_LIMITER, entity.getControlBehavior().intValue());
         assertEquals(0, entity.getBurst().intValue());

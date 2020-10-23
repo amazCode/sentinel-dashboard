@@ -30,6 +30,8 @@ public class AppInfo {
 
     private Integer appType = 0;
 
+    private String aliasName;
+    
     private Set<MachineInfo> machines = ConcurrentHashMap.newKeySet();
 
     public AppInfo() {}
@@ -132,4 +134,12 @@ public class AppInfo {
     public boolean isDead() {
         return !heartbeatJudge(DashboardConfig.getRemoveAppNoMachineMillis());
     }
+
+	public String getAliasName() {
+		return aliasName;
+	}
+
+	public void setAliasName(String aliasName) {
+		this.aliasName = aliasName;
+	}
 }

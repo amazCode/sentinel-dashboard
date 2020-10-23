@@ -30,7 +30,6 @@ public class DashboardApplication {
 
     public static void main(String[] args) {
         triggerSentinelInit();
-//        System.setProperty("csp.sentinel.app.type", "1");  //控制是否有api  添加上会显示api列表，但是链路树形等一些规则添加消失 不添加不会显示  
         SpringApplication.run(DashboardApplication.class, args);
     }
 

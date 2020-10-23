@@ -31,7 +31,7 @@ public class UpdateFlowRuleReqVo {
 
     private Double count;
 
-    private Long interval;
+    private Long gatewayFlowRuleInterval;
 
     private Integer intervalUnit;
 
@@ -75,12 +75,12 @@ public class UpdateFlowRuleReqVo {
         this.count = count;
     }
 
-    public Long getInterval() {
-        return interval;
+    public Long getGatewayFlowRuleInterval() {
+        return gatewayFlowRuleInterval;
     }
 
-    public void setInterval(Long interval) {
-        this.interval = interval;
+    public void setGatewayFlowRuleInterval(Long gatewayFlowRuleInterval) {
+        this.gatewayFlowRuleInterval = gatewayFlowRuleInterval;
     }
 
     public Integer getIntervalUnit() {

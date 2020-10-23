@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.Table;
 
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.IdentifiedEntity;
@@ -28,6 +29,7 @@ public class ServiceInterfaceDetail   extends IdentifiedEntity{
 	/**
 	 * 接口url地址
 	 */
+	@Lob
 	private String urlAddress;
 	/**
 	 * 接口功能描述 如：用来获取历史的故障档案

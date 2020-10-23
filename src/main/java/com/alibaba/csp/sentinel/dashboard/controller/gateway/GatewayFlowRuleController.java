@@ -16,6 +16,44 @@
 package com.alibaba.csp.sentinel.dashboard.controller.gateway;
 
 
+import static com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants.PARAM_MATCH_STRATEGY_CONTAINS;
+import static com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants.PARAM_MATCH_STRATEGY_EXACT;
+import static com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants.PARAM_MATCH_STRATEGY_REGEX;
+import static com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants.PARAM_PARSE_STRATEGY_CLIENT_IP;
+import static com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants.PARAM_PARSE_STRATEGY_COOKIE;
+import static com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants.PARAM_PARSE_STRATEGY_HEADER;
+import static com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants.PARAM_PARSE_STRATEGY_HOST;
+import static com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants.PARAM_PARSE_STRATEGY_URL_PARAM;
+import static com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants.RESOURCE_MODE_CUSTOM_API_NAME;
+import static com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants.RESOURCE_MODE_ROUTE_ID;
+import static com.alibaba.csp.sentinel.dashboard.datasource.entity.gateway.GatewayFlowRuleEntity.INTERVAL_UNIT_DAY;
+import static com.alibaba.csp.sentinel.dashboard.datasource.entity.gateway.GatewayFlowRuleEntity.INTERVAL_UNIT_HOUR;
+import static com.alibaba.csp.sentinel.dashboard.datasource.entity.gateway.GatewayFlowRuleEntity.INTERVAL_UNIT_MINUTE;
+import static com.alibaba.csp.sentinel.dashboard.datasource.entity.gateway.GatewayFlowRuleEntity.INTERVAL_UNIT_SECOND;
+import static com.alibaba.csp.sentinel.slots.block.RuleConstant.CONTROL_BEHAVIOR_DEFAULT;
+import static com.alibaba.csp.sentinel.slots.block.RuleConstant.CONTROL_BEHAVIOR_RATE_LIMITER;
+import static com.alibaba.csp.sentinel.slots.block.RuleConstant.FLOW_GRADE_QPS;
+import static com.alibaba.csp.sentinel.slots.block.RuleConstant.FLOW_GRADE_THREAD;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.csp.sentinel.adapter.gateway.common.api.GatewayApiDefinitionManager;
+import com.alibaba.csp.sentinel.adapter.gateway.common.rule.GatewayFlowRule;
+import com.alibaba.csp.sentinel.adapter.gateway.common.rule.GatewayRuleManager;
 import com.alibaba.csp.sentinel.dashboard.auth.AuthAction;
 import com.alibaba.csp.sentinel.dashboard.auth.AuthService;
 import com.alibaba.csp.sentinel.dashboard.client.SentinelApiClient;
@@ -27,19 +65,10 @@ import com.alibaba.csp.sentinel.dashboard.domain.vo.gateway.rule.AddFlowRuleReqV
 import com.alibaba.csp.sentinel.dashboard.domain.vo.gateway.rule.GatewayParamFlowItemVo;
 import com.alibaba.csp.sentinel.dashboard.domain.vo.gateway.rule.UpdateFlowRuleReqVo;
 import com.alibaba.csp.sentinel.dashboard.repository.gateway.InMemGatewayFlowRuleStore;
+import com.alibaba.csp.sentinel.dashboard.repository.rule.RuleRepository;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowRule;
+import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import com.alibaba.csp.sentinel.util.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import static com.alibaba.csp.sentinel.slots.block.RuleConstant.*;
-import static com.alibaba.csp.sentinel.adapter.gateway.common.SentinelGatewayConstants.*;
-import static com.alibaba.csp.sentinel.dashboard.datasource.entity.gateway.GatewayFlowRuleEntity.*;
 
 /**
  * Gateway flow rule Controller for manage gateway flow rules.
@@ -53,8 +82,11 @@ public class GatewayFlowRuleController {
 
     private final Logger logger = LoggerFactory.getLogger(GatewayFlowRuleController.class);
 
-    @Autowired
-    private InMemGatewayFlowRuleStore repository;
+    @Autowired  
+    @Qualifier("ruleRepositoryAdapter")
+    private RuleRepository<GatewayFlowRuleEntity, Long> repository;
+//    @Autowired
+//    private InMemGatewayFlowRuleStore repository;
 
     @Autowired
     private SentinelApiClient sentinelApiClient;
@@ -74,9 +106,9 @@ public class GatewayFlowRuleController {
         }
 
         try {
-            List<GatewayFlowRuleEntity> rules = sentinelApiClient.fetchGatewayFlowRules(app, ip, port).get();
-            repository.saveAll(rules);
-            return Result.ofSuccess(rules);
+//            List<GatewayFlowRuleEntity> rules = sentinelApiClient.fetchGatewayFlowRules(app, ip, port).get();
+        	 List<GatewayFlowRuleEntity> rules = repository.findAllByApp(app,GatewayFlowRuleEntity.class);
+             return Result.ofSuccess(rules);
         } catch (Throwable throwable) {
             logger.error("query gateway flow rules error:", throwable);
             return Result.ofThrowable(-1, throwable);
@@ -126,8 +158,11 @@ public class GatewayFlowRuleController {
 
         // 针对请求属性
         GatewayParamFlowItemVo paramItem = reqVo.getParamItem();
+        Date date = new Date();
         if (paramItem != null) {
             GatewayParamFlowItemEntity itemEntity = new GatewayParamFlowItemEntity();
+            itemEntity.setGmtCreate(date);
+            itemEntity.setGmtModified(date);
             entity.setParamItem(itemEntity);
 
             // 参数属性 0-ClientIP 1-Remote Host 2-Header 3-URL参数 4-Cookie
@@ -181,7 +216,7 @@ public class GatewayFlowRuleController {
         entity.setCount(count);
 
         // 间隔
-        Long interval = reqVo.getInterval();
+        Long interval = reqVo.getGatewayFlowRuleInterval();
         if (interval == null) {
             return Result.ofFail(-1, "interval can't be null");
         }
@@ -232,7 +267,7 @@ public class GatewayFlowRuleController {
             entity.setMaxQueueingTimeoutMs(maxQueueingTimeoutMs);
         }
 
-        Date date = new Date();
+        
         entity.setGmtCreate(date);
         entity.setGmtModified(date);
 
@@ -271,8 +306,10 @@ public class GatewayFlowRuleController {
 
         // 针对请求属性
         GatewayParamFlowItemVo paramItem = reqVo.getParamItem();
+        Date date = new Date();
         if (paramItem != null) {
             GatewayParamFlowItemEntity itemEntity = new GatewayParamFlowItemEntity();
+            itemEntity.setGmtCreate(date);
             entity.setParamItem(itemEntity);
 
             // 参数属性 0-ClientIP 1-Remote Host 2-Header 3-URL参数 4-Cookie
@@ -328,7 +365,7 @@ public class GatewayFlowRuleController {
         entity.setCount(count);
 
         // 间隔
-        Long interval = reqVo.getInterval();
+        Long interval = reqVo.getGatewayFlowRuleInterval();
         if (interval == null) {
             return Result.ofFail(-1, "interval can't be null");
         }
@@ -379,7 +416,7 @@ public class GatewayFlowRuleController {
             entity.setMaxQueueingTimeoutMs(maxQueueingTimeoutMs);
         }
 
-        Date date = new Date();
+        
         entity.setGmtModified(date);
 
         try {
