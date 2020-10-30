@@ -16,8 +16,18 @@
 package com.alibaba.csp.sentinel.dashboard.datasource.entity.gateway;
 
 import com.alibaba.csp.sentinel.adapter.gateway.common.rule.GatewayParamFlowItem;
+import com.alibaba.csp.sentinel.dashboard.datasource.entity.IdentifiedEntity;
 
+import java.util.Date;
 import java.util.Objects;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
  * Entity for {@link GatewayParamFlowItem}.
@@ -25,8 +35,13 @@ import java.util.Objects;
  * @author cdfive
  * @since 1.7.0
  */
-public class GatewayParamFlowItemEntity {
-
+@Entity
+@Table(name = "t_gateway_param_flow_item")
+public class GatewayParamFlowItemEntity extends IdentifiedEntity{
+//    @Id
+//    @GeneratedValue  已经继承了IdentifiedEntity 这里记得去掉
+//	private Long id;
+	
     private Integer parseStrategy;
 
     private String fieldName;
@@ -34,7 +49,10 @@ public class GatewayParamFlowItemEntity {
     private String pattern;
 
     private Integer matchStrategy;
-
+    
+    private Date gmtCreate;
+    private Date gmtModified;
+    
     public Integer getParseStrategy() {
         return parseStrategy;
     }
@@ -92,4 +110,21 @@ public class GatewayParamFlowItemEntity {
                 ", matchStrategy=" + matchStrategy +
                 '}';
     }
+
+	public Date getGmtCreate() {
+		return gmtCreate;
+	}
+
+	public void setGmtCreate(Date gmtCreate) {
+		this.gmtCreate = gmtCreate;
+	}
+
+	public Date getGmtModified() {
+		return gmtModified;
+	}
+
+	public void setGmtModified(Date gmtModified) {
+		this.gmtModified = gmtModified;
+	}
+
 }

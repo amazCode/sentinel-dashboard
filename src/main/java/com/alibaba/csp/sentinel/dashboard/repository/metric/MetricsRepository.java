@@ -15,6 +15,7 @@
  */
 package com.alibaba.csp.sentinel.dashboard.repository.metric;
 
+import java.util.Date;
 import java.util.List;
 
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.MetricEntity;
@@ -63,7 +64,7 @@ public interface MetricsRepository<T> {
     
     
     
-    List<T> queryByTime(Integer pageIndex, Integer pageSize,String key);
+    List<T> queryByTime(Integer pageIndex, Integer pageSize,String key,Date startTime,Date endTime);
      
     Integer countByTime(String key);
      

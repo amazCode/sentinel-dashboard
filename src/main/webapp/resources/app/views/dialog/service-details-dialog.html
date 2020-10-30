@@ -1,4 +1,4 @@
-<div>
+<div><!-- 管理服务下接口使用 -->
   <span class="brand" style="font-weight:bold;">{{serviceRecordsDialog.title}}</span>
   <div class="card" style="margin-top: 10px;margin-bottom: 5px;">
      <div class="inputs-header">
@@ -8,8 +8,6 @@
         </div>
   
     <div class="panel-body">
-     <!--  <div class="row" style="margin-top: 20px; margin-bottom: 20px;"> -->
-       <!--  <form role="form" class="form-horizontal"> -->
         <div style=" height:500px; overflow:scroll; overflow-x:hidden;overflow-y: auto;">
          <table class="table"   style="border-left: none; border-right:none;margin-top: -5px;padding-top: 1px;table-layout: fixed;"  ><!-- table-layout: fixed; -->
             <thead>
@@ -49,12 +47,20 @@
           </table>
          </div>
         </div>
-      <!--   </form> -->
-      <!-- </div> -->
+         <!-- 分页 ↓-->
+          <div class="pagination-footer">
+          <dir-pagination-controls boundary-links="true" template-url="app/views/pagination.tpl.html" pagination-id="entriesServiceDetailPagination"
+            on-page-change="">
+          </dir-pagination-controls>
+          <div class="tools" style="">
+            <span>共 {{interfacePageConfig.totalCount}} 条记录, </span>
+            <span> 每页<input class="form-control" ng-model="interfacePageConfig.pageSize"> 条记录,</span>
+            <span>第 {{interfacePageConfig.currentPageIndex}} / {{interfacePageConfig.totalPage}} 页</span>
+          </div>
+          <!-- .tools -->
+        </div>
+          <!-- 分页↑ -->
       <div class="separator"></div>
-     <!-- <div id="mySframe" style="display: none; position: absolute; background-color: #7d8489; width: 150px;" ng-show="myFrameShow">
-               悬浮框内容
-      </div> -->
      
    
   </div>

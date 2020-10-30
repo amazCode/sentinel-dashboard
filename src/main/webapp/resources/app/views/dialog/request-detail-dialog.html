@@ -24,7 +24,7 @@
             </thead>
             <tbody>
               <tr current-page="requestDetailPageConfig.currentPageIndex" 
-              dir-paginate="entry in requestDetailList | orderBy:['-count','-gmtCreate' ]| itemsPerPage: requestDetailPageConfig.totalCount "
+              dir-paginate="entry in requestDetailList | orderBy:['-count','-gmtCreate' ]| itemsPerPage: requestDetailPageConfig.pageSize "
                 pagination-id="entriesRequestDetailPagination">
                 <td style="word-wrap:break-word;word-break:break-all;">{{$index+1}}</td>
                 <td style="white-space:nowrap;overflow:hidden;text-overflow: ellipsis" title="{{entry.resource}}">{{entry.resource}} </td>
@@ -39,6 +39,20 @@
           </table>
          </div>
         </div>
+        <!-- 分页 ↓-->
+          <div class="pagination-footer">
+          <dir-pagination-controls boundary-links="true" template-url="app/views/pagination.tpl.html" pagination-id="entriesRequestDetailPagination"
+            on-page-change="">
+          </dir-pagination-controls>
+          <div class="tools" style="">
+            <span>共 {{requestDetailPageConfig.totalCount}} 条记录, </span>
+            <span> 每页<input class="form-control" ng-model="requestDetailPageConfig.pageSize"> 条记录,</span>
+            <span>第 {{requestDetailPageConfig.currentPageIndex}} / {{requestDetailPageConfig.totalPage}} 页</span>
+          </div>
+          <!-- .tools -->
+        </div>
+          <!-- 分页↑ -->
+         
       <div class="separator"></div>
    
   </div>

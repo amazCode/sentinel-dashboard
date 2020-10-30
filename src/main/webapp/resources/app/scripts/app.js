@@ -360,6 +360,23 @@ angular
           }]
         }
       })
+      
+       .state('dashboard.metricStatistics', {//监控统计
+        templateUrl: 'app/views/metricStatistics.html',
+        url: '/metric/:app',
+        controller: 'MetricStatisticsCtl',
+        resolve: {
+          loadMyFiles: ['$ocLazyLoad', function ($ocLazyLoad) {
+            return $ocLazyLoad.load({
+              name: 'sentinelDashboardApp',
+              files: [
+                'app/scripts/controllers/metricStatistics.js',
+              ]
+            });
+          }]
+        }
+      })
+      
 
       .state('dashboard.gatewayApi', {
         templateUrl: 'app/views/gateway/api.html',

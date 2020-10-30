@@ -19,9 +19,20 @@ import com.alibaba.csp.sentinel.adapter.gateway.common.rule.GatewayFlowRule;
 import com.alibaba.csp.sentinel.adapter.gateway.common.rule.GatewayParamFlowItem;
 import com.alibaba.csp.sentinel.dashboard.datasource.entity.rule.RuleEntity;
 import com.alibaba.csp.sentinel.slots.block.Rule;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import java.util.Date;
 import java.util.Objects;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * Entity for {@link GatewayFlowRule}.
@@ -29,6 +40,8 @@ import java.util.Objects;
  * @author cdfive
  * @since 1.7.0
  */
+@Entity
+@Table(name = "t_gateway_flow_rule")
 public class GatewayFlowRuleEntity implements RuleEntity {
 
     /**间隔单位*/
@@ -40,7 +53,8 @@ public class GatewayFlowRuleEntity implements RuleEntity {
     public static final int INTERVAL_UNIT_HOUR = 2;
     /**3-天*/
     public static final int INTERVAL_UNIT_DAY = 3;
-
+    @Id
+	@JsonSerialize(using = ToStringSerializer.class)
     private Long id;
     private String app;
     private String ip;
@@ -54,7 +68,7 @@ public class GatewayFlowRuleEntity implements RuleEntity {
 
     private Integer grade;
     private Double count;
-    private Long interval;
+    private Long gatewayFlowRuleInterval;
     private Integer intervalUnit;
 
     private Integer controlBehavior;
@@ -62,6 +76,10 @@ public class GatewayFlowRuleEntity implements RuleEntity {
 
     private Integer maxQueueingTimeoutMs;
 
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "paramFlowItemId",referencedColumnName="id")
+    @Transient
     private GatewayParamFlowItemEntity paramItem;
 
     public static Long calIntervalSec(Long interval, Integer intervalUnit) {
@@ -104,7 +122,7 @@ public class GatewayFlowRuleEntity implements RuleEntity {
 
         rule.setGrade(grade);
         rule.setCount(count);
-        rule.setIntervalSec(calIntervalSec(interval, intervalUnit));
+        rule.setIntervalSec(calIntervalSec(gatewayFlowRuleInterval, intervalUnit));
 
         rule.setControlBehavior(controlBehavior);
 
@@ -262,12 +280,12 @@ public class GatewayFlowRuleEntity implements RuleEntity {
         this.count = count;
     }
 
-    public Long getInterval() {
-        return interval;
+    public Long getGatewayFlowRuleInterval() {
+        return gatewayFlowRuleInterval;
     }
 
-    public void setInterval(Long interval) {
-        this.interval = interval;
+    public void setInterval(Long gatewayFlowRuleInterval) {
+        this.gatewayFlowRuleInterval = gatewayFlowRuleInterval;
     }
 
     public Integer getIntervalUnit() {
@@ -317,7 +335,7 @@ public class GatewayFlowRuleEntity implements RuleEntity {
                 Objects.equals(resourceMode, that.resourceMode) &&
                 Objects.equals(grade, that.grade) &&
                 Objects.equals(count, that.count) &&
-                Objects.equals(interval, that.interval) &&
+                Objects.equals(gatewayFlowRuleInterval, that.gatewayFlowRuleInterval) &&
                 Objects.equals(intervalUnit, that.intervalUnit) &&
                 Objects.equals(controlBehavior, that.controlBehavior) &&
                 Objects.equals(burst, that.burst) &&
@@ -327,7 +345,7 @@ public class GatewayFlowRuleEntity implements RuleEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, app, ip, port, gmtCreate, gmtModified, resource, resourceMode, grade, count, interval, intervalUnit, controlBehavior, burst, maxQueueingTimeoutMs, paramItem);
+        return Objects.hash(id, app, ip, port, gmtCreate, gmtModified, resource, resourceMode, grade, count, gatewayFlowRuleInterval, intervalUnit, controlBehavior, burst, maxQueueingTimeoutMs, paramItem);
     }
 
     @Override
@@ -343,7 +361,7 @@ public class GatewayFlowRuleEntity implements RuleEntity {
                 ", resourceMode=" + resourceMode +
                 ", grade=" + grade +
                 ", count=" + count +
-                ", interval=" + interval +
+                ", interval=" + gatewayFlowRuleInterval +
                 ", intervalUnit=" + intervalUnit +
                 ", controlBehavior=" + controlBehavior +
                 ", burst=" + burst +

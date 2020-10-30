@@ -270,7 +270,21 @@ function(e, t, r, a) {
                 })
             }]
         }
-    }).state("dashboard.gatewayApi", {
+    }).state("dashboard.metricStatistics", {//监控统计
+        templateUrl: "app/views/metricStatistics.html",
+        url: "/metric/:app",
+        controller: "MetricStatisticsCtl",
+        resolve: {
+            loadMyFiles: ["$ocLazyLoad",
+            function(e) {
+                return e.load({
+                    name: "sentinelDashboardApp",
+                    files: ["app/scripts/controllers/metricStatistics.js"]
+                })
+            }]
+        }
+    })
+    .state("dashboard.gatewayApi", {
         templateUrl: "app/views/gateway/api.html",
         url: "/gateway/api/:app",
         controller: "GatewayApiCtl",
@@ -705,6 +719,13 @@ function(l) {
     this.queryAppSortedIdentities = function(e) {
         return l({
             url: "/metric/queryTopResourceMetric.json",
+            params: e,
+            method: "GET"
+        })
+    },
+    this.queryResourceMetricByTime = function(e) {
+        return l({
+            url: "/metric/queryResourceMetricByTime",
             params: e,
             method: "GET"
         })

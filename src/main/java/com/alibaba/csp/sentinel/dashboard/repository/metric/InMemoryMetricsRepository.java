@@ -21,6 +21,7 @@ import com.alibaba.csp.sentinel.util.TimeUtil;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -165,7 +166,7 @@ public class InMemoryMetricsRepository implements MetricsRepository<MetricEntity
     }
 
 	@Override
-	public List<MetricEntity> queryByTime(Integer pageIndex, Integer pageSize, String key) {
+	public List<MetricEntity> queryByTime(Integer pageIndex, Integer pageSize, String key,Date starTime,Date endTime) {
 		// TODO Auto-generated method stub
 		return null;
 	}

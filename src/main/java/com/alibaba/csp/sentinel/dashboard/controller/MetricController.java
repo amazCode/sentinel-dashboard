@@ -15,8 +15,11 @@
  */
 package com.alibaba.csp.sentinel.dashboard.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,7 +68,6 @@ public class MetricController {
                                             Long startTime, Long endTime, String searchKey) {
     	
     	List<String> topResource = new ArrayList<>();
-    	 
         final Map<String, Iterable<MetricVo>> map = new ConcurrentHashMap<>();
      
      Integer totalCount = 0;
@@ -78,7 +80,14 @@ public class MetricController {
         if(StringUtil.isNotBlank(searchKey)&&totalPage==1){
             pageIndex = 1;
         }
-            List<MetricEntity> entities = metricStore.queryByTime(pageIndex,pageSize,searchKey);
+            List<MetricEntity> results = metricStore.queryByTime(pageIndex,pageSize,searchKey,null,null);
+            List<MetricEntity> entities = new ArrayList<>();
+            for (MetricEntity metric : results) {
+  	    	  Date whenTime = new Date(System.currentTimeMillis() - 6 * 3600 * 1000);
+  	         if (metric.getGmtCreate().after(whenTime)) {
+  	        	entities.add(metric);
+  	         }
+  	        }
             if (entities!=null && entities.size()!=0) {
                for (MetricEntity entity:entities) {
                   String res = entity.getResource();
@@ -181,8 +190,77 @@ public class MetricController {
 //        resultMap.put("metric", map2);
 //        return Result.ofSuccess(resultMap);
     }
-
+    
+    
     @ResponseBody
+    @RequestMapping("/queryResourceMetricByTime")
+    public Result<?> queryResourceMetricByTime(final String app,
+                                            Integer pageIndex,
+                                            Integer pageSize,
+                                            Boolean desc,
+                                            String searchStartTime, String searchEndTime, String searchKey) throws ParseException {
+    	
+    	List<String> topResource = new ArrayList<>();
+    	 
+    	
+    	Date startTime =  getTime(searchStartTime);  
+    	Date endTime = getTime(searchEndTime);
+        final Map<String, Iterable<MetricVo>> map = new ConcurrentHashMap<>();
+     
+     Integer totalCount = 0;
+     Integer totalPage = 0;
+//        totalCount = metricStore.countByTime(searchKey);
+//        if (totalCount==0){
+//            return Result.ofSuccess(null);
+//        }
+        totalPage = (totalCount + pageSize - 1) / pageSize;
+        if(StringUtil.isNotBlank(searchKey)&&totalPage==1){
+            pageIndex = 1;
+        }
+            List<MetricEntity> entities = metricStore.queryByTime(pageIndex,pageSize,searchKey,startTime,endTime);
+            if (entities!=null && entities.size()!=0) {
+               for (MetricEntity entity:entities) {
+                  String res = entity.getResource();
+              List<MetricVo> vos = MetricVo.fromMetricEntities(entities, res);
+              map.put(res, vos);
+             }
+             topResource = entities.stream().map(MetricEntity::getResource).collect(Collectors.toList());
+     
+            }
+     if (topResource == null || topResource.isEmpty()) {
+      return Result.ofSuccess(null);
+     }
+     
+        Map<String, Object> resultMap = new HashMap<>(16);
+        resultMap.put("totalCount", totalCount);
+        resultMap.put("totalPage", totalPage);
+        resultMap.put("pageIndex", pageIndex);
+        resultMap.put("pageSize", pageSize);
+     
+        Map<String, Iterable<MetricVo>> map2 = new LinkedHashMap<>();
+        // order matters.
+        for (String identity : topResource) {
+            map2.put(identity, map.get(identity));
+        }
+        resultMap.put("metric", map2);
+        return Result.ofSuccess(resultMap);
+
+    }
+    
+    
+
+    private Date getTime(String searchTime) throws ParseException {
+		// TODO Auto-generated method stub
+    	Date date = null;
+    	SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+    	if(!"Invalid date".equals(searchTime)) {
+    		date = format.parse(searchTime);
+    	}
+		return date;
+	}
+
+
+	@ResponseBody
     @RequestMapping("/queryByAppAndResource.json")
     public Result<?> queryByAppAndResource(String app, String identity, Long startTime, Long endTime) {
         if (StringUtil.isEmpty(app)) {

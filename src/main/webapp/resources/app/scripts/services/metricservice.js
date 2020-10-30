@@ -9,6 +9,14 @@ app.service('MetricService', ['$http', function ($http) {
       method: 'GET'
     });
   };
+  
+  this.queryResourceMetricByTime = function (params) {
+	    return $http({
+	      url: '/metric/queryResourceMetricByTime',
+	      params: params,
+	      method: 'GET'
+	    });
+	  };
 
   this.queryByAppAndIdentity = function (params) {
     return $http({

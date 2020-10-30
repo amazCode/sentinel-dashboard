@@ -88,6 +88,7 @@ app.controller('ServiceManagerCtl', ['$scope', '$stateParams', 'MachineService',
 //        	 $("#save").hide();
         	 $scope.currentService =  angular.copy(entity);
         	 $scope.interfacePageConfig = {
+        		  pageSize:10,
            	      currentPageIndex: 1,
            	      totalPage: 1,
            	      totalCount: 0,
@@ -109,7 +110,7 @@ app.controller('ServiceManagerCtl', ['$scope', '$stateParams', 'MachineService',
                   if (data.code == 0 && data.data) {
                     $scope.serviceList = data.data;
                     $scope.interfacePageConfig.totalCount = $scope.serviceList.length;
-                    $scope.interfacePageConfig.pageSize = $scope.serviceList.length;
+//                    $scope.interfacePageConfig.pageSize = $scope.serviceList.length;
                   }else {
                 	   $scope.serviceList = [];
                   }

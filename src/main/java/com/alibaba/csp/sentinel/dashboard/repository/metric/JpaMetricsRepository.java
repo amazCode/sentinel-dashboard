@@ -1,5 +1,7 @@
 package com.alibaba.csp.sentinel.dashboard.repository.metric;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -144,12 +146,15 @@ public class JpaMetricsRepository implements MetricsRepository<MetricEntity> {
 	}
 
 	@Override
-	public List<MetricEntity> queryByTime(Integer pageIndex, Integer pageSize, String key) {
+	public List<MetricEntity> queryByTime(Integer pageIndex, Integer pageSize, String key,Date startTime,Date endTime) {
 		 List<MetricEntity> results = new ArrayList<MetricEntity>();
-		 
+		 SimpleDateFormat simple = new SimpleDateFormat("yyyy/MM/dd HH:MM:SS");
 	      StringBuilder hql = new StringBuilder();
+	      List<MetricEntity> metrics = new ArrayList<>();
+	      try {
 	      hql.append("FROM MetricEntity");
-	      hql.append(" WHERE timestamp<=:endTime");
+	      
+	      hql.append(" WHERE   timestamp   >=:startTime  AND    timestamp<=:endTime");
 	      if (StringUtil.isNotBlank(key)){
 	         hql.append(" AND resource LIKE :key ");
 	      }
@@ -157,23 +162,31 @@ public class JpaMetricsRepository implements MetricsRepository<MetricEntity> {
 	      Query query = em.createQuery(hql.toString());
 	      query.setMaxResults(pageSize);
 	      query.setFirstResult((pageIndex-1)*pageSize);
-	      query.setParameter("endTime", Date.from(Instant.ofEpochMilli(System.currentTimeMillis())));
+	      Date currentTime = Date.from(Instant.ofEpochMilli(System.currentTimeMillis()));
+	      if(startTime==null&&endTime==null) {
+				query.setParameter("startTime",simple.parse("1970/1/1 00:00:00") );
+				query.setParameter("endTime", currentTime);
+	      }else if(startTime==null&&endTime!=null) {
+	    	    query.setParameter("startTime",simple.parse("1970/1/1 00:00:00") );
+				query.setParameter("endTime", endTime);
+	      }else if(startTime!=null&&endTime==null) {
+	    	    query.setParameter("startTime",startTime);
+				query.setParameter("endTime", currentTime);
+	      }else {
+	    	    query.setParameter("startTime",startTime);
+				query.setParameter("endTime", endTime);
+	      }
 	      if (StringUtil.isNotBlank(key)){
 	         query.setParameter("key","%"+key+"%");
 	      }
-	      List<MetricEntity> metrics = query.getResultList();
+	         metrics = query.getResultList();
+	      } catch (ParseException e) {
+				e.printStackTrace();
+			}
 	      if (CollectionUtils.isEmpty(metrics)) {
 	         return results;
 	      }
-	 
-	      for (MetricEntity metric : metrics) {
-	         if (metric.getGmtCreate().after(new Date(System.currentTimeMillis() - 6 * 3600 * 1000))) {
-	            results.add(metric);
-	         }
-	      }
-	 
-	      return results;
-
+	      return metrics;
 	}
 
 	@Override

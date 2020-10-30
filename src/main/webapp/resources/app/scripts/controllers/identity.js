@@ -14,7 +14,7 @@ app.controller('IdentityCtl', ['$scope', '$stateParams', 'IdentityService',
     $scope.totalCount = 0;
     $scope.identities = [];
     // 数据自动刷新频率, 默认10s
-    var DATA_REFRESH_INTERVAL = 30;
+    var DATA_REFRESH_INTERVAL = 60;
 
     $scope.isExpand = true;
     $scope.searchKey = '';

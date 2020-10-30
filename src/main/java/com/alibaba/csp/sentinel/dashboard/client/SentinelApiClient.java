@@ -357,8 +357,10 @@ public class SentinelApiClient {
             params = new HashMap<>(1);
             params.put("type", type);
         }
-        return executeCommand(ip, port, api, params, false)
+        CompletableFuture<List<T>> result = executeCommand(ip, port, api, params, false)
                 .thenApply(json -> JSON.parseArray(json, ruleType));
+        
+        return result;
     }
     
     @Nullable

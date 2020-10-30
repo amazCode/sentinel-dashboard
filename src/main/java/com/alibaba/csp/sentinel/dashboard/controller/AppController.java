@@ -165,7 +165,7 @@ public class AppController {
     		 List<MetricEntity> metrics = em.findByCondition(MetricEntity.class, " resource like '%"+serviceNameMatch+"%'", new Object[] {});
      		if(CollectionUtils.isEmpty(metrics))
      			return Result.ofFail(500,"未找到该服务的相关接口");
-         	log.info("正在统计接口的服务的名称："+metrics.get(0).getResource().split("/")[1]);
+         	log.info("正在统计接口的服务的名称："+name);
          	 Map<String, List<MetricEntity>>  metricMap = metrics.stream()
          			 .filter(MetricEntity ->  MetricEntity.getResource().split("/")[1].equals(name) )
          			 .collect(Collectors.groupingBy(MetricEntity::getResource));

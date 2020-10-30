@@ -25,8 +25,8 @@ app.controller('RequestRecordCtl', ['$scope', '$stateParams', 'MachineService', 
     	$scope.requestDetailList ;
     	 $scope.requestDetailPageConfig = {
           	      currentPageIndex: 1,
-//          	      pageSize:10,
-//          	      totalPage: 1,
+          	      pageSize:10,
+          	      totalPage: 1,
           	      totalCount: 0,
           	    };
     	
